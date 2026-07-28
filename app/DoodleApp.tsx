@@ -97,11 +97,45 @@ function initials(name: string) {
     .toUpperCase();
 }
 
+const CREATE_DURATIONS = [
+  { value: 60, label: "1 hour" },
+  { value: 120, label: "2 hours" },
+  { value: 180, label: "3 hours" },
+  { value: 240, label: "4 hours" },
+  { value: 300, label: "5 hours" },
+  { value: 1440, label: "All day" },
+];
+
+const dayFormatter = new Intl.DateTimeFormat(undefined, {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+});
+const timeFormatter = new Intl.DateTimeFormat(undefined, {
+  hour: "numeric",
+  minute: "2-digit",
+});
+
 function durationLabel(minutes: number) {
+  if (minutes >= 1440) return "All day";
   if (minutes < 60) return `${minutes} min`;
   if (minutes === 60) return "1 hour";
   if (minutes % 60 === 0) return `${minutes / 60} hours`;
   return `${Math.floor(minutes / 60)}½ hours`;
+}
+
+function formatSlotRange(value: string, durationMinutes: number) {
+  const start = new Date(value);
+  if (Number.isNaN(start.getTime())) return null;
+  const day = dayFormatter.format(start);
+  if (durationMinutes >= 1440) {
+    return { day, time: "All day" };
+  }
+  const end = new Date(start.getTime() + durationMinutes * 60_000);
+  return {
+    day,
+    time: `${timeFormatter.format(start)} – ${timeFormatter.format(end)}`,
+  };
 }
 
 function PollSkeleton() {
@@ -133,6 +167,7 @@ function CreatePoll() {
   });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [editing, setEditing] = useState<number | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(draftStorageKey);
@@ -140,9 +175,15 @@ function CreatePoll() {
     try {
       const parsed = JSON.parse(saved) as CreateDraft;
       if (parsed.options?.length) {
+        const known = CREATE_DURATIONS.some(
+          (item) => item.value === parsed.durationMinutes,
+        );
         // Restore the device-local draft after hydration.
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setDraft(parsed);
+        setDraft({
+          ...parsed,
+          durationMinutes: known ? parsed.durationMinutes : 120,
+        });
       }
     } catch {
       localStorage.removeItem(draftStorageKey);
@@ -166,6 +207,29 @@ function CreatePoll() {
       options: current.options.map((option, optionIndex) =>
         optionIndex === index ? value : option,
       ),
+    }));
+  }
+
+  function removeOption(index: number) {
+    setDraft((current) => ({
+      ...current,
+      options: current.options.filter((_, i) => i !== index),
+    }));
+    setEditing(null);
+  }
+
+  function addOption() {
+    setDraft((current) => ({
+      ...current,
+      options: [
+        ...current.options,
+        toLocalInput(
+          new Date(
+            new Date(current.options.at(-1) || Date.now()).getTime() +
+              86_400_000,
+          ),
+        ),
+      ],
     }));
   }
 
@@ -234,16 +298,6 @@ function CreatePoll() {
             a truly tiny group scheduler with no accounts, no ads, and no
             bullshit 😇
           </p>
-          {/*
-            <div
-              className="promise-row"
-              aria-label="doodlebutwithoutfuckingads benefits"
-            >
-              <span>✦ No sign-up</span>
-              <span>✦ No email gate</span>
-              <span>✦ No past times</span>
-            </div>
-          */}
         </div>
 
         <form className="create-card" onSubmit={submit}>
@@ -251,18 +305,35 @@ function CreatePoll() {
             <h2>What are we planning?</h2>
           </div>
 
-          <label>
-            <span>
-              Event name <span className="required-marker">*</span>
-            </span>
-            <input
-              value={draft.title}
-              onChange={(event) => update("title", event.target.value)}
-              placeholder={nextMonthCraftNight()}
-              autoComplete="off"
-              required
-            />
-          </label>
+          <div className="two-fields">
+            <label>
+              <span>
+                Event name <span className="required-marker">*</span>
+              </span>
+              <input
+                value={draft.title}
+                onChange={(event) => update("title", event.target.value)}
+                placeholder={nextMonthCraftNight()}
+                autoComplete="off"
+                required
+              />
+            </label>
+            <label>
+              Duration
+              <select
+                value={draft.durationMinutes}
+                onChange={(event) =>
+                  update("durationMinutes", Number(event.target.value))
+                }
+              >
+                {CREATE_DURATIONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
           <div className="two-fields">
             <label>
@@ -288,93 +359,106 @@ function CreatePoll() {
             </label>
           </div>
 
-          <label>
-            A quick note
-            <input
-              value={draft.note}
-              onChange={(event) => update("note", event.target.value)}
-              placeholder="Bring wine"
-              autoComplete="off"
-            />
-          </label>
-
-          <div className="form-divider" />
-
-          <div className="time-heading">
-            <div>
-              <p className="micro-label">Options</p>
-              <h3>When could it happen?</h3>
+          <div className="form-section">
+            <p className="micro-label">Pick some times</p>
+            <div className="slot-chip-list">
+              {draft.options.map((option, index) => {
+                const label = formatSlotRange(option, draft.durationMinutes);
+                const open = editing === index;
+                return (
+                  <div
+                    className={`slot-chip ${open ? "open" : ""}`}
+                    key={index}
+                  >
+                    <div className="slot-chip-row">
+                      <button
+                        type="button"
+                        className="slot-chip-face"
+                        onClick={() => setEditing(open ? null : index)}
+                        aria-expanded={open}
+                      >
+                        {label ? (
+                          <span className="slot-chip-when">
+                            <strong>{label.day}</strong>
+                            <span>{label.time}</span>
+                          </span>
+                        ) : (
+                          <span className="slot-chip-when">
+                            <strong>Pick a date & time</strong>
+                          </span>
+                        )}
+                        <span className="slot-chip-edit">
+                          {open ? "Done" : "Edit"}
+                        </span>
+                      </button>
+                      {draft.options.length > 2 && (
+                        <button
+                          type="button"
+                          className="slot-chip-remove"
+                          aria-label={`Remove time option ${index + 1}`}
+                          onClick={() => removeOption(index)}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                    {open && (
+                      <div className="slot-chip-editor">
+                        <input
+                          aria-label={`Edit time option ${index + 1}`}
+                          type={
+                            draft.durationMinutes >= 1440
+                              ? "date"
+                              : "datetime-local"
+                          }
+                          value={
+                            draft.durationMinutes >= 1440
+                              ? option.slice(0, 10)
+                              : option
+                          }
+                          min={
+                            draft.durationMinutes >= 1440
+                              ? toLocalInput(new Date()).slice(0, 10)
+                              : toLocalInput(new Date())
+                          }
+                          onChange={(event) => {
+                            const next =
+                              draft.durationMinutes >= 1440
+                                ? `${event.target.value}T00:00`
+                                : event.target.value;
+                            updateOption(index, next);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <label className="duration-field">
-              Length
-              <select
-                value={draft.durationMinutes}
-                onChange={(event) =>
-                  update("durationMinutes", Number(event.target.value))
-                }
-              >
-                <option value={30}>30 min</option>
-                <option value={60}>1 hour</option>
-                <option value={90}>1½ hours</option>
-                <option value={120}>2 hours</option>
-                <option value={180}>3 hours</option>
-                <option value={240}>4 hours</option>
-              </select>
+
+            <button type="button" className="add-slot" onClick={addOption}>
+              <span aria-hidden="true">＋</span> Add another time
+            </button>
+          </div>
+
+          <div className="form-section">
+            <label>
+              A quick note
+              <input
+                value={draft.note}
+                onChange={(event) => update("note", event.target.value)}
+                placeholder="Bring wine"
+                autoComplete="off"
+              />
             </label>
           </div>
-
-          <div className="time-list">
-            {draft.options.map((option, index) => (
-              <div className="time-row" key={index}>
-                <span>{pad(index + 1)}</span>
-                <input
-                  aria-label={`Time option ${index + 1}`}
-                  type="datetime-local"
-                  value={option}
-                  min={toLocalInput(new Date())}
-                  onChange={(event) => updateOption(index, event.target.value)}
-                />
-                {draft.options.length > 2 && (
-                  <button
-                    type="button"
-                    className="icon-button"
-                    aria-label={`Remove time option ${index + 1}`}
-                    onClick={() =>
-                      update(
-                        "options",
-                        draft.options.filter((_, i) => i !== index),
-                      )
-                    }
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            className="add-time"
-            onClick={() =>
-              update("options", [
-                ...draft.options,
-                toLocalInput(
-                  new Date(
-                    new Date(draft.options.at(-1) || Date.now()).getTime() +
-                      86_400_000,
-                  ),
-                ),
-              ])
-            }
-          >
-            <span>＋</span> Add another time
-          </button>
 
           {error && <p className="form-error">{error}</p>}
 
           <button className="primary-button create-button" disabled={creating}>
-            <span>{creating ? "Making your poll…" : "Create & get the link"}</span>
+            <span>
+              {creating ? "Making your poll…" : "Create & get the link"}
+            </span>
             <span aria-hidden="true">↗</span>
           </button>
         </form>

@@ -295,7 +295,8 @@ a {
 
 .create-card > label + label,
 .create-card > label + .two-fields,
-.two-fields + label {
+.two-fields + label,
+.two-fields + .two-fields {
   margin-top: 22px;
 }
 
@@ -309,48 +310,140 @@ a {
   color: var(--coral);
 }
 
-.form-divider {
-  height: 1px;
-  margin: 34px 0;
-  background: #e3e5e1;
+.form-section {
+  margin-top: 34px;
+  border-top: 1px solid #e3e5e1;
+  padding-top: 26px;
 }
 
-.time-heading {
-  justify-content: space-between;
-  align-items: flex-end;
+.form-section .micro-label {
+  margin-bottom: 14px;
 }
 
-.duration-field {
-  width: 128px;
+.form-section > label {
+  display: grid;
+  gap: 5px;
+  color: #53605a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.duration-field select {
-  height: 40px;
-  cursor: pointer;
-}
-
-.time-list {
+.slot-chip-list {
   display: grid;
   gap: 10px;
-  margin-top: 20px;
 }
 
-.time-row {
-  display: grid;
-  grid-template-columns: 28px 1fr 34px;
-  gap: 9px;
+.slot-chip {
+  border: 1px solid #cdd4ce;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.slot-chip.open {
+  border-color: #36705c;
+  box-shadow: 0 0 0 3px rgba(168, 230, 202, 0.34);
+}
+
+.slot-chip-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.slot-chip-face {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 14px 16px;
+  text-align: left;
 }
 
-.time-row > span {
-  color: #88938e;
-  font-size: 10px;
+.slot-chip-when {
+  display: grid;
+  gap: 2px;
+}
+
+.slot-chip-when strong {
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.slot-chip-when span {
+  color: #69746f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.slot-chip-edit {
+  flex: 0 0 auto;
+  color: #2b654f;
+  font-size: 12px;
   font-weight: 800;
 }
 
-.time-row input {
-  height: 48px;
+.slot-chip-remove {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  border: 0;
+  border-left: 1px solid #eceeeb;
+  background: transparent;
+  color: #69746f;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.slot-chip-remove:hover {
+  background: #fdeae4;
+  color: #9f3f29;
+}
+
+.slot-chip-editor {
+  border-top: 1px solid #eceeeb;
+  padding: 12px 16px 16px;
+}
+
+.slot-chip-editor input {
+  height: 46px;
   color-scheme: light;
+}
+
+.add-slot {
+  width: 100%;
+  margin-top: 12px;
+  border: 1.5px dashed #9fb4a9;
+  border-radius: 12px;
+  background: transparent;
+  color: #2b654f;
+  cursor: pointer;
+  padding: 13px;
+  font-size: 13px;
+  font-weight: 800;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.add-slot:hover {
+  border-color: #2b654f;
+  background: var(--mint-soft);
+}
+
+.add-slot span {
+  margin-right: 6px;
 }
 
 .icon-button {
@@ -362,26 +455,6 @@ a {
   cursor: pointer;
   font-size: 20px;
   line-height: 1;
-}
-
-.add-time {
-  margin: 16px 0 4px 37px;
-  border: 0;
-  background: transparent;
-  color: #2b654f;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.add-time span {
-  display: inline-grid;
-  place-items: center;
-  width: 21px;
-  height: 21px;
-  margin-right: 5px;
-  border: 1px solid #4a806c;
-  border-radius: 50%;
 }
 
 .form-error {

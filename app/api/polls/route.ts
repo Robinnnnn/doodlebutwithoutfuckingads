@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const note = clean(body.note, 240);
     const timezone = clean(body.timezone, 80) || "UTC";
     const durationMinutes = Math.min(
-      720,
+      1440,
       Math.max(15, Number(body.durationMinutes) || 60),
     );
     const options = Array.from(
