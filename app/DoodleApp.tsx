@@ -534,16 +534,14 @@ function CreatePoll() {
                             >
                               {open ? <IconCheck /> : <IconPencil />}
                             </button>
-                            {draft.options.length > 2 && (
-                              <button
-                                type="button"
-                                className="slot-chip-action danger"
-                                aria-label={`Remove time option ${index + 1}`}
-                                onClick={() => removeOption(index)}
-                              >
-                                <IconTrash />
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              className="slot-chip-action danger"
+                              aria-label={`Remove time option ${index + 1}`}
+                              onClick={() => removeOption(index)}
+                            >
+                              <IconTrash />
+                            </button>
                           </div>
                         </div>
                         {open && (
