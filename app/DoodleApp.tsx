@@ -293,7 +293,7 @@ function CreatePoll() {
             <input
               value={draft.note}
               onChange={(event) => update("note", event.target.value)}
-              placeholder="Bring wine."
+              placeholder="Bring wine"
               autoComplete="off"
             />
           </label>
