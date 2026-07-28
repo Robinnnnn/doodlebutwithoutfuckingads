@@ -862,9 +862,6 @@ function PollView({ pollId }: { pollId: string }) {
                     <strong>None of the above</strong>
                   </div>
                 </div>
-                <div className="vote-tally">
-                  <span>Can’t make any of these</span>
-                </div>
               </button>
             </div>
           ) : (
