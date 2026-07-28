@@ -968,8 +968,8 @@ function PollView({ pollId }: { pollId: string }) {
                 <span aria-hidden="true">→</span>
               </button>
               <p>
-                Your name is only shown to this group. No email gate. No
-                account.
+                Your name is only shown to this group. No emails. No
+                accounts.
               </p>
             </div>
           )}
