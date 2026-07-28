@@ -908,11 +908,6 @@ function PollView({ pollId }: { pollId: string }) {
           </div>
         )}
       </div>
-
-      <footer className="poll-footer">
-        <span>{brand}</span>
-        <span>Scheduling, without the nonsense.</span>
-      </footer>
     </main>
   );
 }
