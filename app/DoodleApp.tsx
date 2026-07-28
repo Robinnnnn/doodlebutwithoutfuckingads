@@ -273,7 +273,7 @@ function CreatePoll() {
               <input
                 value={draft.location}
                 onChange={(event) => update("location", event.target.value)}
-                placeholder="Robin’s place"
+                placeholder="Jasmine’s penthouse"
                 autoComplete="off"
               />
             </label>
