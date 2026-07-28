@@ -75,6 +75,35 @@ function IconTrash({ className }: { className?: string }) {
   );
 }
 
+function IconCopy({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect
+        x="5.5"
+        y="5.5"
+        width="8"
+        height="8"
+        rx="1.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M10.5 5.5V4A1.5 1.5 0 009 2.5H4A1.5 1.5 0 002.5 4v5A1.5 1.5 0 004 10.5h1.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 const draftStorageKey = "doodlebutwithoutfuckingads:create-draft";
 
 function pad(value: number) {
@@ -714,7 +743,7 @@ function PollView({ pollId }: { pollId: string }) {
     await navigator.clipboard.writeText(
       `${window.location.origin}/p/${pollId}`,
     );
-    setNotice("Poll link copied.");
+    setNotice("Copied to clipboard");
   }
 
   if (status === "loading" || !response) return <PollSkeleton />;
@@ -754,8 +783,13 @@ function PollView({ pollId }: { pollId: string }) {
           {brand}
         </Link>
         <div className="nav-actions">
-          <button className="share-button" type="button" onClick={copyLink}>
-            Copy poll link <span aria-hidden="true">↗</span>
+          <button
+            className="share-button"
+            type="button"
+            onClick={copyLink}
+            aria-label="Copy poll link"
+          >
+            <IconCopy />
           </button>
         </div>
       </nav>
