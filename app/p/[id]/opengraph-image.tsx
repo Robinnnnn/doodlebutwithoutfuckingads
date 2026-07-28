@@ -13,16 +13,17 @@ const brand = (
     style={{
       alignItems: "baseline",
       display: "flex",
-      fontSize: 31,
+      fontSize: 29,
       fontWeight: 800,
       letterSpacing: "-1.5px",
     }}
   >
     <span style={{ color: "#1c2c28" }}>doodle</span>
     <span style={{ color: "#1c2c28" }}>butwithout</span>
-    <span style={{ color: "#a54f3b" }}>fucking</span>
+    <span style={{ color: "#ff806a" }}>fucking</span>
     <span style={{ color: "#267057" }}>ads</span>
     <span style={{ color: "#ff806a" }}>.</span>
+    <span style={{ color: "#1c2c28" }}>com</span>
   </div>
 );
 

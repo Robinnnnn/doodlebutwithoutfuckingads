@@ -83,7 +83,7 @@ a {
 }
 
 .brand strong {
-  color: #a54f3b;
+  color: var(--coral);
   font-weight: 800;
 }
 
@@ -92,6 +92,12 @@ a {
   font-family: var(--font-display);
   font-size: 28px;
   line-height: 0;
+}
+
+.brand em {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 800;
 }
 
 .text-link {

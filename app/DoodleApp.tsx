@@ -48,8 +48,8 @@ type CreateDraft = {
 };
 
 const brand = (
-  <span className="brand" aria-label="doodlebutwithoutfuckingads">
-    <b>doodle</b><b>butwithout</b><strong>fucking</strong><span>ads</span><i>.</i>
+  <span className="brand" aria-label="doodlebutwithoutfuckingads.com">
+    <b>doodle</b><b>butwithout</b><strong>fucking</strong><span>ads</span><i>.</i><em>com</em>
   </span>
 );
 

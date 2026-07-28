@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: new URL("/og-fallback-v2.png", origin),
+          url: new URL("/og.png", origin),
           width: 1200,
           height: 630,
           alt: "doodlebutwithoutfuckingads — Find a time. Skip the circus.",
@@ -49,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [new URL("/og-fallback-v2.png", origin)],
+      images: [new URL("/og.png", origin)],
     },
   };
 }

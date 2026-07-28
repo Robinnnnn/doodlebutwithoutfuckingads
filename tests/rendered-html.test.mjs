@@ -16,7 +16,7 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   assert.match(app, /Skip the circus\./);
   assert.match(
     app,
-    /<b>doodle<\/b><b>butwithout<\/b><strong>fucking<\/strong><span>ads<\/span>/,
+    /<b>doodle<\/b><b>butwithout<\/b><strong>fucking<\/strong><span>ads<\/span><i>\.<\/i><em>com<\/em>/,
   );
   assert.doesNotMatch(app, /New poll/);
   assert.match(app, /Create Poll/);
@@ -29,7 +29,7 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
     layout,
     /doodlebutwithoutfuckingads — find a time, skip the circus/,
   );
-  assert.match(layout, /\/og-fallback-v2\.png/);
+  assert.match(layout, /\/og\.png/);
   assert.match(styles, /\.option-card\.selected/);
   assert.match(packageJson, /"name": "doodlebutwithoutfuckingads"/);
   assert.match(worker, /www\.doodlebutwithoutfuckingads\.com/);

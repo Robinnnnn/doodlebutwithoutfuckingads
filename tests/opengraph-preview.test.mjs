@@ -22,6 +22,9 @@ test("poll pages publish private-by-design social preview metadata", async () =>
   assert.match(image, /doodle/);
   assert.match(image, /butwithout/);
   assert.match(image, /fucking/);
+  assert.match(image, />ads<\/span>/);
+  assert.match(image, />\.<\/span>/);
+  assert.match(image, />com<\/span>/);
   assert.match(image, /Open the poll/);
   assert.match(image, /s-maxage=3600/);
 
