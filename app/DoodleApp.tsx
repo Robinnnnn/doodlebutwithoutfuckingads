@@ -333,7 +333,7 @@ function CreatePoll() {
         throw new Error(payload.error || "The poll could not be created.");
       }
       localStorage.removeItem(draftStorageKey);
-      window.location.href = `/p/${payload.id}?created=1`;
+      window.location.href = `/p/${payload.id}`;
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -765,10 +765,6 @@ function PollView({ pollId }: { pollId: string }) {
             <div>
               <span className="meta-icon">◷</span>
               <span>{durationLabel(poll.durationMinutes)}</span>
-            </div>
-            <div>
-              <span className="meta-icon">◎</span>
-              <span>{poll.timezone.replaceAll("_", " ")}</span>
             </div>
           </div>
           {poll.note && <p className="poll-note">“{poll.note}”</p>}

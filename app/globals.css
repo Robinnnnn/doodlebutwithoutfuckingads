@@ -593,13 +593,26 @@ a {
 }
 
 .poll-shell {
+  position: relative;
   width: min(1060px, calc(100% - 48px));
   margin: 26px auto 80px;
-  overflow: hidden;
   border: 1px solid rgba(27, 42, 36, 0.16);
   border-radius: 30px;
   background: var(--paper);
   box-shadow: 0 24px 70px rgba(47, 75, 63, 0.08);
+}
+
+.poll-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 124px;
+  height: 22px;
+  top: -11px;
+  left: 50%;
+  background: rgba(216, 238, 112, 0.7);
+  transform: translateX(-50%) rotate(2deg);
+  pointer-events: none;
 }
 
 .poll-intro {
@@ -608,17 +621,6 @@ a {
   grid-template-columns: 1.3fr 0.7fr;
   gap: 30px 70px;
   padding: 68px 72px 56px;
-}
-
-.poll-intro::after {
-  content: "";
-  position: absolute;
-  width: 124px;
-  height: 22px;
-  top: -12px;
-  right: 17%;
-  background: rgba(216, 238, 112, 0.7);
-  transform: rotate(2deg);
 }
 
 .poll-title-block h1 {
