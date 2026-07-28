@@ -138,6 +138,19 @@ function formatSlotRange(value: string, durationMinutes: number) {
   };
 }
 
+function sortOptions(options: string[]) {
+  return [...options].sort((a, b) => {
+    const aTime = Date.parse(a);
+    const bTime = Date.parse(b);
+    const aInvalid = Number.isNaN(aTime);
+    const bInvalid = Number.isNaN(bTime);
+    if (aInvalid && bInvalid) return 0;
+    if (aInvalid) return 1;
+    if (bInvalid) return -1;
+    return aTime - bTime;
+  });
+}
+
 function PollSkeleton() {
   return (
     <main className="poll-page">
@@ -186,6 +199,7 @@ function CreatePoll() {
           setDraft({
             ...parsed,
             durationMinutes: known ? parsed.durationMinutes : 120,
+            options: sortOptions(parsed.options),
           });
           setReady(true);
           return;
@@ -194,7 +208,10 @@ function CreatePoll() {
         localStorage.removeItem(draftStorageKey);
       }
     }
-    setDraft((current) => ({ ...current, options: initialTimes() }));
+    setDraft((current) => ({
+      ...current,
+      options: sortOptions(initialTimes()),
+    }));
     setReady(true);
   }, []);
 
@@ -219,27 +236,46 @@ function CreatePoll() {
     }));
   }
 
+  function toggleEditor(index: number) {
+    if (editing === index) {
+      setDraft((current) => ({
+        ...current,
+        options: sortOptions(current.options),
+      }));
+      setEditing(null);
+      return;
+    }
+
+    const target = draft.options[index];
+    const sorted = sortOptions(draft.options);
+    setDraft((current) => ({
+      ...current,
+      options: sortOptions(current.options),
+    }));
+    setEditing(sorted.indexOf(target));
+  }
+
   function removeOption(index: number) {
     setDraft((current) => ({
       ...current,
-      options: current.options.filter((_, i) => i !== index),
+      options: sortOptions(current.options.filter((_, i) => i !== index)),
     }));
     setEditing(null);
   }
 
   function addOption() {
-    setDraft((current) => ({
-      ...current,
-      options: [
-        ...current.options,
-        toLocalInput(
-          new Date(
-            new Date(current.options.at(-1) || Date.now()).getTime() +
-              86_400_000,
-          ),
-        ),
-      ],
-    }));
+    setDraft((current) => {
+      const options = sortOptions(current.options);
+      const base = options.at(-1) || toLocalInput(new Date());
+      return {
+        ...current,
+        options: sortOptions([
+          ...options,
+          toLocalInput(new Date(new Date(base).getTime() + 86_400_000)),
+        ]),
+      };
+    });
+    setEditing(null);
   }
 
   async function submit(event: FormEvent) {
@@ -403,7 +439,7 @@ function CreatePoll() {
                           <button
                             type="button"
                             className="slot-chip-face"
-                            onClick={() => setEditing(open ? null : index)}
+                            onClick={() => toggleEditor(index)}
                             aria-expanded={open}
                           >
                             {label ? (
