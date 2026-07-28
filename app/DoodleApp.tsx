@@ -54,6 +54,74 @@ const brand = (
   </span>
 );
 
+function IconPencil({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 3l3 3"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconCheck({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 8.5l3.5 3.5L13 4"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconTrash({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 4.5h10M6 4.5V3.25A.75.75 0 016.75 2.5h2.5a.75.75 0 01.75.75V4.5M12.25 4.5l-.4 8.1a1 1 0 01-1 .9H5.15a1 1 0 01-1-.9l-.4-8.1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const draftStorageKey = "doodlebutwithoutfuckingads:create-draft";
 
 function pad(value: number) {
@@ -452,20 +520,31 @@ function CreatePoll() {
                                 <strong>Pick a date & time</strong>
                               </span>
                             )}
-                            <span className="slot-chip-edit">
-                              {open ? "Done" : "Edit"}
-                            </span>
                           </button>
-                          {draft.options.length > 2 && (
+                          <div className="slot-chip-actions">
                             <button
                               type="button"
-                              className="slot-chip-remove"
-                              aria-label={`Remove time option ${index + 1}`}
-                              onClick={() => removeOption(index)}
+                              className="slot-chip-action"
+                              aria-label={
+                                open
+                                  ? `Done editing time option ${index + 1}`
+                                  : `Edit time option ${index + 1}`
+                              }
+                              onClick={() => toggleEditor(index)}
                             >
-                              ×
+                              {open ? <IconCheck /> : <IconPencil />}
                             </button>
-                          )}
+                            {draft.options.length > 2 && (
+                              <button
+                                type="button"
+                                className="slot-chip-action danger"
+                                aria-label={`Remove time option ${index + 1}`}
+                                onClick={() => removeOption(index)}
+                              >
+                                <IconTrash />
+                              </button>
+                            )}
+                          </div>
                         </div>
                         {open && (
                           <div className="slot-chip-editor">

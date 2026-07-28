@@ -390,12 +390,11 @@ a {
   min-width: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 14px 8px 14px 16px;
   text-align: left;
 }
 
@@ -416,29 +415,41 @@ a {
   font-weight: 600;
 }
 
-.slot-chip-edit {
+.slot-chip-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   flex: 0 0 auto;
-  color: #2b654f;
-  font-size: 12px;
-  font-weight: 800;
+  padding-right: 8px;
 }
 
-.slot-chip-remove {
+.slot-chip-action {
   display: grid;
   place-items: center;
-  width: 44px;
+  width: 34px;
+  height: 34px;
   border: 0;
-  border-left: 1px solid #eceeeb;
+  border-radius: 9px;
   background: transparent;
-  color: #69746f;
+  color: #5e6b65;
   cursor: pointer;
-  font-size: 18px;
-  line-height: 1;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
 }
 
-.slot-chip-remove:hover {
+.slot-chip-action:hover {
+  background: var(--mint-soft);
+  color: #164f3b;
+}
+
+.slot-chip-action.danger:hover {
   background: #fdeae4;
   color: #9f3f29;
+}
+
+.slot-chip.open .slot-chip-action:not(.danger) {
+  color: #164f3b;
 }
 
 .slot-chip-editor {
