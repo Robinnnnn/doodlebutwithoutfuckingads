@@ -223,8 +223,7 @@ a {
 }
 
 .form-heading,
-.time-heading,
-.response-label {
+.time-heading {
   display: flex;
   align-items: flex-start;
   gap: 17px;
