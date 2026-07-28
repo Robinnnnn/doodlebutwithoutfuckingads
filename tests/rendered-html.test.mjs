@@ -36,6 +36,7 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   assert.match(styles, /\.option-card\.selected/);
   assert.match(styles, /\.desktop-sample-link\s*\{\s*display: none;/);
   assert.match(styles, /\.mobile-sample-link\s*\{\s*display: inline;/);
+  assert.match(styles, /\.create-nav\s*\{\s*justify-content: center;/);
   assert.match(styles, /\.poll-nav\s*\{\s*height: auto;[\s\S]*flex-direction: column;/);
   assert.match(packageJson, /"name": "doodlebutwithoutfuckingads"/);
   assert.match(worker, /www\.doodlebutwithoutfuckingads\.com/);
