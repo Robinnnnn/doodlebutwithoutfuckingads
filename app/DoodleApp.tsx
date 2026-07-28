@@ -116,7 +116,7 @@ function PollSkeleton() {
 function CreatePoll() {
   const [draft, setDraft] = useState<CreateDraft>({
     title: "",
-    organizer: "Gianna",
+    organizer: "Gemma",
     location: "",
     note: "",
     durationMinutes: 120,
@@ -263,7 +263,7 @@ function CreatePoll() {
               <input
                 value={draft.organizer}
                 onChange={(event) => update("organizer", event.target.value)}
-                placeholder="Gianna"
+                placeholder="Gemma"
                 autoComplete="name"
                 required
               />
@@ -273,7 +273,7 @@ function CreatePoll() {
               <input
                 value={draft.location}
                 onChange={(event) => update("location", event.target.value)}
-                placeholder="Penthouse de Jas"
+                placeholder="Narnia"
                 autoComplete="off"
               />
             </label>
