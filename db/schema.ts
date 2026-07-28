@@ -61,6 +61,7 @@ export const votes = sqliteTable(
     optionId: text("option_id")
       .notNull()
       .references(() => pollOptions.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("yes"),
   },
   (table) => [primaryKey({ columns: [table.responseId, table.optionId] })],
 );

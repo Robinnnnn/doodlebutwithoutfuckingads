@@ -750,6 +750,7 @@ a {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 30px;
   margin-bottom: 30px;
 }
@@ -760,10 +761,22 @@ a {
   gap: 17px;
 }
 
+.section-heading > div:first-child {
+  flex-direction: column;
+  gap: 5px;
+}
+
 .section-heading h2 {
   margin: 0;
   font-size: 24px;
   letter-spacing: -0.04em;
+}
+
+.availability-hint {
+  margin: 0;
+  color: #77817c;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .section-heading > p {
@@ -771,6 +784,38 @@ a {
   color: #77817c;
   font-size: 11px;
   font-weight: 700;
+}
+
+.results-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid #ccd4ce;
+  border-radius: 999px;
+  background: #eef1ed;
+  padding: 3px;
+}
+
+.results-view-toggle button {
+  min-height: 33px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #65716b;
+  cursor: pointer;
+  padding: 0 13px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.results-view-toggle button.active {
+  background: var(--paper);
+  color: var(--green);
+  box-shadow: 0 1px 4px rgba(27, 42, 36, 0.12);
 }
 
 .option-grid {
@@ -810,6 +855,12 @@ a {
   box-shadow: inset 0 0 0 1px #2e765a;
 }
 
+.option-card.if-needed {
+  border-color: #d5aa3b;
+  background: #fff8dc;
+  box-shadow: inset 0 0 0 1px #d5aa3b;
+}
+
 .option-choice {
   display: flex;
   align-items: center;
@@ -834,6 +885,12 @@ a {
   background: var(--green);
 }
 
+.if-needed .fake-checkbox {
+  border-color: #b88709;
+  background: #e9ba3f;
+  color: #4d3700;
+}
+
 .option-date {
   display: block;
   color: #6b7771;
@@ -848,6 +905,20 @@ a {
   margin-top: 2px;
   font-size: 19px;
   letter-spacing: -0.03em;
+}
+
+.availability-choice-label {
+  display: block;
+  margin-top: 5px;
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.if-needed .availability-choice-label {
+  color: #8a6507;
 }
 
 .vote-tally {
@@ -877,6 +948,184 @@ a {
 .avatar-3 {
   background: var(--lime);
   color: #3c4e11;
+}
+
+.availability-grid-wrap {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid #d7ddd8;
+  border-radius: 16px;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.availability-grid {
+  width: 100%;
+  min-width: 620px;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.availability-grid th,
+.availability-grid td {
+  border-right: 1px solid #e4e7e3;
+  border-bottom: 1px solid #e4e7e3;
+}
+
+.availability-grid tr > :last-child {
+  border-right: 0;
+}
+
+.availability-grid tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.availability-grid thead th {
+  width: 132px;
+  background: #f8f6ef;
+  padding: 13px 9px;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.availability-grid thead th:first-child,
+.availability-grid tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: 176px;
+  box-shadow: 5px 0 10px -10px rgba(27, 42, 36, 0.55);
+  text-align: left;
+}
+
+.availability-grid thead th:first-child {
+  z-index: 3;
+  color: #6d7872;
+  padding-left: 16px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.availability-grid thead th > span,
+.availability-grid thead th > strong {
+  display: block;
+}
+
+.availability-grid thead th > span {
+  color: #6d7872;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.availability-grid thead th > strong {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.availability-grid tbody th {
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.availability-grid td {
+  height: 54px;
+  background: #fff;
+  text-align: center;
+}
+
+.grid-participant {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+}
+
+.grid-participant > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grid-participant small {
+  display: block;
+  color: #718078;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.grid-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #e6eee9;
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.grid-status,
+.availability-legend i {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.grid-status.yes,
+.availability-legend i.yes {
+  background: var(--mint-soft);
+  color: var(--green);
+}
+
+.grid-status.if-needed,
+.availability-legend i.if-needed {
+  background: #fff3c6;
+  color: #8a6507;
+}
+
+.grid-status.unavailable,
+.availability-legend i.unavailable {
+  background: #f0f1ef;
+  color: #9ca39f;
+}
+
+.availability-legend {
+  min-width: 620px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  border-top: 1px solid #e4e7e3;
+  background: #fbfaf6;
+  padding: 9px 13px;
+  color: #66716b;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.availability-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.availability-legend i {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  font-size: 11px;
 }
 
 .empty-options {
@@ -1277,11 +1526,20 @@ a {
 
   .section-heading {
     align-items: flex-start;
+    gap: 14px;
   }
 
   .section-heading > p {
     max-width: 90px;
     text-align: right;
+  }
+
+  .results-view-toggle {
+    width: 100%;
+  }
+
+  .results-view-toggle button {
+    flex: 1;
   }
 
   .option-grid {
@@ -1290,6 +1548,32 @@ a {
 
   .option-card {
     min-height: 112px;
+  }
+
+  .availability-grid-wrap {
+    margin-right: -20px;
+    margin-left: -20px;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .availability-grid {
+    min-width: 540px;
+  }
+
+  .availability-grid thead th {
+    width: 116px;
+  }
+
+  .availability-grid thead th:first-child,
+  .availability-grid tbody th {
+    width: 142px;
+  }
+
+  .availability-legend {
+    min-width: 540px;
+    justify-content: flex-start;
   }
 
   .name-entry {

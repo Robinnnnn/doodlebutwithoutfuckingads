@@ -50,6 +50,7 @@ export function ensureSchema() {
           CREATE TABLE IF NOT EXISTS votes (
             response_id TEXT NOT NULL REFERENCES responses(id) ON DELETE CASCADE,
             option_id TEXT NOT NULL REFERENCES poll_options(id) ON DELETE CASCADE,
+            status TEXT NOT NULL DEFAULT 'yes',
             PRIMARY KEY (response_id, option_id)
           )
         `),

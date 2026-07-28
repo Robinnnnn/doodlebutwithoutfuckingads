@@ -5,7 +5,13 @@ type ResponsePayload = {
   token?: string;
   name?: string;
   optionIds?: string[];
+  availabilities?: Array<{
+    optionId?: string;
+    status?: string;
+  }>;
 };
+
+type AvailabilityStatus = "yes" | "if-needed";
 
 export async function POST(
   request: Request,
@@ -17,13 +23,32 @@ export async function POST(
     const body = (await request.json()) as ResponsePayload;
     const token = body.token?.trim().slice(0, 100) || "";
     const name = body.name?.trim().slice(0, 60) || "";
-    const optionIds = Array.from(
-      new Set(
-        (Array.isArray(body.optionIds) ? body.optionIds : [])
-          .filter((value): value is string => typeof value === "string")
-          .map((value) => value.slice(0, 100)),
-      ),
-    ).slice(0, 30);
+    const rawAvailabilities = Array.isArray(body.availabilities)
+      ? body.availabilities
+      : (Array.isArray(body.optionIds) ? body.optionIds : []).map(
+          (optionId) => ({ optionId, status: "yes" }),
+        );
+    const availabilityMap = new Map<string, AvailabilityStatus>();
+    for (const availability of rawAvailabilities.slice(0, 30)) {
+      if (
+        typeof availability?.optionId !== "string" ||
+        (availability.status !== "yes" &&
+          availability.status !== "if-needed")
+      ) {
+        continue;
+      }
+      availabilityMap.set(
+        availability.optionId.slice(0, 100),
+        availability.status,
+      );
+    }
+    const availabilities = Array.from(
+      availabilityMap,
+      ([optionId, status]) => ({ optionId, status }),
+    );
+    const optionIds = availabilities.map(
+      (availability) => availability.optionId,
+    );
 
     if (!token || !name) {
       return Response.json(
@@ -90,12 +115,12 @@ export async function POST(
 
     await db.batch([
       ...statements,
-      ...optionIds.map((optionId) =>
+      ...availabilities.map(({ optionId, status }) =>
         db
           .prepare(
-            "INSERT INTO votes (response_id, option_id) VALUES (?, ?)",
+            "INSERT INTO votes (response_id, option_id, status) VALUES (?, ?, ?)",
           )
-          .bind(responseId, optionId),
+          .bind(responseId, optionId, status),
       ),
     ]);
 

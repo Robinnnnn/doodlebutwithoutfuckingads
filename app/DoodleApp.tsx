@@ -8,11 +8,24 @@ import {
   useState,
 } from "react";
 
+type AvailabilityStatus = "yes" | "if-needed";
+
+type Availability = {
+  optionId: string;
+  status: AvailabilityStatus;
+};
+
 type PollOption = {
   id: string;
   startsAt: string;
-  voteCount: number;
-  voters: string[];
+  yesVoters: string[];
+  ifNeededVoters: string[];
+};
+
+type PollParticipant = {
+  id: string;
+  name: string;
+  availabilities: Availability[];
 };
 
 type Poll = {
@@ -24,18 +37,24 @@ type Poll = {
   timezone: string;
   durationMinutes: number;
   options: PollOption[];
+  participants: PollParticipant[];
   responseCount: number;
   myResponse: {
+    id: string;
     name: string;
-    optionIds: string[];
+    availabilities: Availability[];
   } | null;
 };
 
 type StoredResponse = {
   token: string;
   name: string;
-  selectedIds: string[];
+  availability: Record<string, AvailabilityStatus>;
   submitted: boolean;
+};
+
+type LegacyStoredResponse = Partial<StoredResponse> & {
+  selectedIds?: string[];
 };
 
 type CreateDraft = {
@@ -103,6 +122,42 @@ function IconCopy({ className }: { className?: string }) {
   );
 }
 
+function IconList() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M5 3h6M5 7h6M5 11h6M2.5 3h.01M2.5 7h.01M2.5 11h.01"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconGrid() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect x="2" y="2" width="4" height="4" rx="0.7" stroke="currentColor" />
+      <rect x="8" y="2" width="4" height="4" rx="0.7" stroke="currentColor" />
+      <rect x="2" y="8" width="4" height="4" rx="0.7" stroke="currentColor" />
+      <rect x="8" y="8" width="4" height="4" rx="0.7" stroke="currentColor" />
+    </svg>
+  );
+}
+
 const draftStorageKey = "doodlebutwithoutfuckingads:create-draft";
 
 function pad(value: number) {
@@ -135,6 +190,28 @@ function nextMonthCraftNight() {
 
 function makeToken() {
   return crypto.randomUUID();
+}
+
+function normalizeStoredResponse(
+  value: LegacyStoredResponse | null,
+): StoredResponse {
+  const legacyAvailability = Object.fromEntries(
+    (value?.selectedIds || [])
+      .filter((optionId): optionId is string => typeof optionId === "string")
+      .map((optionId) => [optionId, "yes" as const]),
+  );
+  const availability = Object.fromEntries(
+    Object.entries(value?.availability || legacyAvailability).filter(
+      (entry): entry is [string, AvailabilityStatus] =>
+        entry[1] === "yes" || entry[1] === "if-needed",
+    ),
+  );
+  return {
+    token: typeof value?.token === "string" ? value.token : makeToken(),
+    name: typeof value?.name === "string" ? value.name : "",
+    availability,
+    submitted: Boolean(value?.submitted),
+  };
 }
 
 function initials(name: string) {
@@ -599,6 +676,7 @@ function PollView({ pollId }: { pollId: string }) {
   const [editing, setEditing] = useState(true);
   const [notice, setNotice] = useState("");
   const [noneChosen, setNoneChosen] = useState(false);
+  const [resultsView, setResultsView] = useState<"list" | "grid">("list");
 
   const storageKey = `doodlebutwithoutfuckingads:response:${pollId}`;
 
@@ -609,16 +687,13 @@ function PollView({ pollId }: { pollId: string }) {
   }, [notice]);
 
   useEffect(() => {
-    let stored: StoredResponse = {
-      token: makeToken(),
-      name: "",
-      selectedIds: [],
-      submitted: false,
-    };
+    let stored = normalizeStoredResponse(null);
     const raw = localStorage.getItem(storageKey);
     if (raw) {
       try {
-        stored = { ...stored, ...(JSON.parse(raw) as StoredResponse) };
+        stored = normalizeStoredResponse(
+          JSON.parse(raw) as LegacyStoredResponse,
+        );
       } catch {
         localStorage.removeItem(storageKey);
       }
@@ -648,24 +723,32 @@ function PollView({ pollId }: { pollId: string }) {
           return {
             ...current,
             name: mine.name,
-            selectedIds: mine.optionIds,
+            availability: Object.fromEntries(
+              mine.availabilities.map((availability) => [
+                availability.optionId,
+                availability.status,
+              ]),
+            ),
             submitted: true,
           };
         });
         if (mine) {
-          setNoneChosen(mine.optionIds.length === 0);
+          setNoneChosen(mine.availabilities.length === 0);
           setEditing(false);
         } else {
           // Keep a locally-saved sample vote when the server is ephemeral.
           try {
             const raw = localStorage.getItem(storageKey);
             const stored = raw
-              ? (JSON.parse(raw) as StoredResponse)
+              ? normalizeStoredResponse(
+                  JSON.parse(raw) as LegacyStoredResponse,
+                )
               : null;
             setEditing(!stored?.submitted);
             setNoneChosen(
               Boolean(
-                stored?.submitted && stored.selectedIds.length === 0,
+                stored?.submitted &&
+                  Object.keys(stored.availability).length === 0,
               ),
             );
           } catch {
@@ -698,11 +781,18 @@ function PollView({ pollId }: { pollId: string }) {
     setNoneChosen(false);
     setResponse((current) => {
       if (!current) return current;
+      const availability = { ...current.availability };
+      const currentStatus = availability[optionId];
+      if (!currentStatus) {
+        availability[optionId] = "yes";
+      } else if (currentStatus === "yes") {
+        availability[optionId] = "if-needed";
+      } else {
+        delete availability[optionId];
+      }
       return {
         ...current,
-        selectedIds: current.selectedIds.includes(optionId)
-          ? current.selectedIds.filter((id) => id !== optionId)
-          : [...current.selectedIds, optionId],
+        availability,
       };
     });
     setNotice("");
@@ -712,7 +802,7 @@ function PollView({ pollId }: { pollId: string }) {
     if (!editing) setEditing(true);
     setNoneChosen(true);
     setResponse((current) =>
-      current ? { ...current, selectedIds: [] } : current,
+      current ? { ...current, availability: {} } : current,
     );
     setNotice("");
   }
@@ -734,7 +824,9 @@ function PollView({ pollId }: { pollId: string }) {
           body: JSON.stringify({
             token: response.token,
             name: response.name.trim(),
-            optionIds: response.selectedIds,
+            availabilities: Object.entries(response.availability).map(
+              ([optionId, status]) => ({ optionId, status }),
+            ),
           }),
         },
       );
@@ -742,9 +834,9 @@ function PollView({ pollId }: { pollId: string }) {
         const payload = (await request.json()) as { error?: string };
         throw new Error(payload.error || "Your response could not be saved.");
       }
-      setResponse((current) =>
-        current ? { ...current, submitted: true } : current,
-      );
+      const submittedResponse = { ...response, submitted: true };
+      setResponse(submittedResponse);
+      localStorage.setItem(storageKey, JSON.stringify(submittedResponse));
       await loadPoll(response.token);
       setEditing(false);
       setNotice("You’re in. Your response is saved.");
@@ -795,6 +887,51 @@ function PollView({ pollId }: { pollId: string }) {
     minute: "2-digit",
     timeZone: poll.timezone,
   });
+  const showingResults = response.submitted && !editing;
+  const participantRows = [...poll.participants];
+  if (response.submitted && !poll.myResponse) {
+    participantRows.unshift({
+      id: "current-response",
+      name: response.name,
+      availabilities: Object.entries(response.availability).map(
+        ([optionId, status]) => ({ optionId, status }),
+      ),
+    });
+  }
+  const participantStatus = (
+    participant: PollParticipant,
+    optionId: string,
+  ) =>
+    participant.availabilities.find(
+      (availability) => availability.optionId === optionId,
+    )?.status;
+  const optionTotals = (optionId: string) => ({
+    yes: participantRows.filter(
+      (participant) => participantStatus(participant, optionId) === "yes",
+    ).length,
+    ifNeeded: participantRows.filter(
+      (participant) =>
+        participantStatus(participant, optionId) === "if-needed",
+    ).length,
+  });
+  const displayOptions = showingResults
+    ? [...poll.options].sort((first, second) => {
+        const firstTotals = optionTotals(first.id);
+        const secondTotals = optionTotals(second.id);
+        return (
+          secondTotals.yes - firstTotals.yes ||
+          secondTotals.ifNeeded - firstTotals.ifNeeded ||
+          first.startsAt.localeCompare(second.startsAt)
+        );
+      })
+    : poll.options;
+  const responseStatuses = Object.values(response.availability);
+  const responseYesCount = responseStatuses.filter(
+    (status) => status === "yes",
+  ).length;
+  const responseIfNeededCount = responseStatuses.filter(
+    (status) => status === "if-needed",
+  ).length;
 
   return (
     <main className="poll-page">
@@ -847,79 +984,238 @@ function PollView({ pollId }: { pollId: string }) {
 
         <section className="vote-section">
           <div className="section-heading">
-            <h2>What works for you?</h2>
+            <div>
+              <h2>
+                {showingResults
+                  ? "Everyone’s availability"
+                  : "What works for you?"}
+              </h2>
+              {!showingResults && (
+                <p className="availability-hint">
+                  Tap once for Yes, twice for If needed.
+                </p>
+              )}
+            </div>
+            {showingResults && (
+              <div
+                className="results-view-toggle"
+                role="group"
+                aria-label="Results view"
+              >
+                <button
+                  type="button"
+                  className={resultsView === "list" ? "active" : ""}
+                  aria-pressed={resultsView === "list"}
+                  onClick={() => setResultsView("list")}
+                >
+                  <IconList />
+                  List
+                </button>
+                <button
+                  type="button"
+                  className={resultsView === "grid" ? "active" : ""}
+                  aria-pressed={resultsView === "grid"}
+                  onClick={() => setResultsView("grid")}
+                >
+                  <IconGrid />
+                  Grid
+                </button>
+              </div>
+            )}
           </div>
 
           {poll.options.length ? (
-            <div className="option-grid">
-              {poll.options.map((option) => {
-                const selected = response.selectedIds.includes(option.id);
-                const date = new Date(option.startsAt);
-                const end = new Date(
-                  date.getTime() + poll.durationMinutes * 60_000,
-                );
-                const timeLabel =
-                  poll.durationMinutes >= 1440
-                    ? "All day"
-                    : `${timeFormatter.format(date)} – ${timeFormatter.format(end)}`;
-                return (
+            showingResults && resultsView === "grid" ? (
+              <div className="availability-grid-wrap">
+                <table className="availability-grid">
+                  <thead>
+                    <tr>
+                      <th scope="col">Participants</th>
+                      {displayOptions.map((option) => {
+                        const date = new Date(option.startsAt);
+                        const end = new Date(
+                          date.getTime() + poll.durationMinutes * 60_000,
+                        );
+                        return (
+                          <th scope="col" key={option.id}>
+                            <span>{formatter.format(date)}</span>
+                            <strong>
+                              {poll.durationMinutes >= 1440
+                                ? "All day"
+                                : `${timeFormatter.format(date)} – ${timeFormatter.format(end)}`}
+                            </strong>
+                          </th>
+                        );
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {participantRows.map((participant) => {
+                      const isCurrent =
+                        participant.id === "current-response" ||
+                        participant.id === poll.myResponse?.id;
+                      return (
+                        <tr key={participant.id}>
+                          <th scope="row">
+                            <span className="grid-participant">
+                              <span className="grid-avatar" aria-hidden="true">
+                                {initials(participant.name)}
+                              </span>
+                              <span>
+                                {participant.name}
+                                {isCurrent && <small>You</small>}
+                              </span>
+                            </span>
+                          </th>
+                          {displayOptions.map((option) => {
+                            const status = participantStatus(
+                              participant,
+                              option.id,
+                            );
+                            const label =
+                              status === "yes"
+                                ? "Yes"
+                                : status === "if-needed"
+                                  ? "If needed"
+                                  : "Unavailable";
+                            return (
+                              <td key={option.id}>
+                                <span
+                                  className={`grid-status ${status || "unavailable"}`}
+                                  aria-label={`${participant.name}: ${label}`}
+                                  role="img"
+                                  title={label}
+                                >
+                                  {status === "yes"
+                                    ? "✓"
+                                    : status === "if-needed"
+                                      ? "~"
+                                      : "×"}
+                                </span>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div
+                  className="availability-legend"
+                  aria-label="Availability key"
+                >
+                  <span>
+                    <i className="yes" aria-hidden="true">✓</i> Yes
+                  </span>
+                  <span>
+                    <i className="if-needed" aria-hidden="true">~</i> If needed
+                  </span>
+                  <span>
+                    <i className="unavailable" aria-hidden="true">×</i>{" "}
+                    Unavailable
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="option-grid">
+                {displayOptions.map((option) => {
+                  const status = response.availability[option.id];
+                  const date = new Date(option.startsAt);
+                  const end = new Date(
+                    date.getTime() + poll.durationMinutes * 60_000,
+                  );
+                  const timeLabel =
+                    poll.durationMinutes >= 1440
+                      ? "All day"
+                      : `${timeFormatter.format(date)} – ${timeFormatter.format(end)}`;
+                  const yesVoters = participantRows.filter(
+                    (participant) =>
+                      participantStatus(participant, option.id) === "yes",
+                  );
+                  const ifNeededVoters = participantRows.filter(
+                    (participant) =>
+                      participantStatus(participant, option.id) ===
+                      "if-needed",
+                  );
+                  const totalResponses =
+                    yesVoters.length + ifNeededVoters.length;
+                  const nextStatus =
+                    status === "yes"
+                      ? "If needed"
+                      : status === "if-needed"
+                        ? "Unavailable"
+                        : "Yes";
+                  return (
+                    <button
+                      className={`option-card ${status === "yes" ? "selected" : ""} ${status === "if-needed" ? "if-needed" : ""}`}
+                      type="button"
+                      key={option.id}
+                      aria-pressed={Boolean(status)}
+                      aria-label={`${formatter.format(date)}, ${timeLabel}. ${status === "yes" ? "Yes" : status === "if-needed" ? "If needed" : "Unavailable"}. Select for ${nextStatus}.`}
+                      onClick={() => toggleOption(option.id)}
+                    >
+                      <div className="option-choice">
+                        <span className="fake-checkbox" aria-hidden="true">
+                          {status === "yes"
+                            ? "✓"
+                            : status === "if-needed"
+                              ? "~"
+                              : ""}
+                        </span>
+                        <div>
+                          <span className="option-date">
+                            {formatter.format(date)}
+                          </span>
+                          <strong>{timeLabel}</strong>
+                          {status && (
+                            <span className="availability-choice-label">
+                              {status === "yes" ? "Yes" : "If needed"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="vote-tally">
+                        <div className="avatar-stack" aria-hidden="true">
+                          {[...yesVoters, ...ifNeededVoters]
+                            .slice(0, 3)
+                            .map((participant, index) => (
+                              <span
+                                className={`avatar avatar-${(index % 3) + 1}`}
+                                key={participant.id}
+                              >
+                                {initials(participant.name)}
+                              </span>
+                            ))}
+                        </div>
+                        <span>
+                          {totalResponses
+                            ? `${yesVoters.length} yes · ${ifNeededVoters.length} if needed`
+                            : "No responses yet"}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+                {!showingResults && (
                   <button
-                    className={`option-card ${selected ? "selected" : ""}`}
+                    className={`option-card none-card ${noneChosen ? "selected" : ""}`}
                     type="button"
-                    key={option.id}
-                    aria-pressed={selected}
-                    onClick={() => toggleOption(option.id)}
+                    aria-pressed={noneChosen}
+                    onClick={pickNone}
                   >
                     <div className="option-choice">
                       <span className="fake-checkbox" aria-hidden="true">
-                        {selected ? "✓" : ""}
+                        {noneChosen ? "✓" : ""}
                       </span>
                       <div>
-                        <span className="option-date">
-                          {formatter.format(date)}
-                        </span>
-                        <strong>{timeLabel}</strong>
+                        <span className="option-date">No fit</span>
+                        <strong>None of the above</strong>
                       </div>
-                    </div>
-                    <div className="vote-tally">
-                      <div className="avatar-stack" aria-hidden="true">
-                        {option.voters.slice(0, 3).map((voter, index) => (
-                          <span
-                            className={`avatar avatar-${(index % 3) + 1}`}
-                            key={`${voter}-${index}`}
-                          >
-                            {initials(voter)}
-                          </span>
-                        ))}
-                      </div>
-                      <span>
-                        {option.voteCount
-                          ? `${option.voteCount} ${
-                              option.voteCount === 1 ? "vote" : "votes"
-                            }`
-                          : "No votes yet"}
-                      </span>
                     </div>
                   </button>
-                );
-              })}
-              <button
-                className={`option-card none-card ${noneChosen ? "selected" : ""}`}
-                type="button"
-                aria-pressed={noneChosen}
-                onClick={pickNone}
-              >
-                <div className="option-choice">
-                  <span className="fake-checkbox" aria-hidden="true">
-                    {noneChosen ? "✓" : ""}
-                  </span>
-                  <div>
-                    <span className="option-date">No fit</span>
-                    <strong>None of the above</strong>
-                  </div>
-                </div>
-              </button>
-            </div>
+                )}
+              </div>
+            )
           ) : (
             <div className="empty-options">
               <span>◷</span>
@@ -942,10 +1238,8 @@ function PollView({ pollId }: { pollId: string }) {
               <span>
                 <strong>{response.name}</strong>
                 <small>
-                  {response.selectedIds.length
-                    ? `${response.selectedIds.length} ${
-                        response.selectedIds.length === 1 ? "time" : "times"
-                      } selected`
+                  {responseStatuses.length
+                    ? `${responseYesCount} yes · ${responseIfNeededCount} if needed`
                     : "Can’t make these times"}
                 </small>
               </span>

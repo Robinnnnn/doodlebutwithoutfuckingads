@@ -1,0 +1,1 @@
+ALTER TABLE `votes` ADD `status` text DEFAULT 'yes' NOT NULL;

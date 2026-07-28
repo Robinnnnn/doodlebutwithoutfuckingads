@@ -33,3 +33,31 @@ export function samplePollDefaults() {
     options: [first.toISOString(), second.toISOString()],
   };
 }
+
+export function samplePollParticipants() {
+  return [
+    {
+      id: "sample-gemma",
+      name: "Gemma",
+      availabilities: [
+        { optionId: "sample-1", status: "yes" as const },
+        { optionId: "sample-2", status: "yes" as const },
+      ],
+    },
+    {
+      id: "sample-priya",
+      name: "Priya",
+      availabilities: [
+        { optionId: "sample-1", status: "yes" as const },
+        { optionId: "sample-2", status: "if-needed" as const },
+      ],
+    },
+    {
+      id: "sample-mateo",
+      name: "Mateo",
+      availabilities: [
+        { optionId: "sample-1", status: "if-needed" as const },
+      ],
+    },
+  ];
+}
