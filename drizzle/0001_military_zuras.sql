@@ -1,0 +1,1 @@
+CREATE INDEX `poll_options_poll_idx` ON `poll_options` (`poll_id`,`starts_at`);
