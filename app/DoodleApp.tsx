@@ -548,7 +548,7 @@ function CreatePoll() {
 
           <button className="primary-button create-button" disabled={creating}>
             <span>
-              {creating ? "Making your poll…" : "Create poll"}
+              {creating ? "Making your poll…" : "Create Poll"}
             </span>
             <span aria-hidden="true">↗</span>
           </button>

@@ -19,7 +19,7 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
     /<b>doodle<\/b><b>butwithout<\/b><strong>fucking<\/strong><span>ads<\/span>/,
   );
   assert.doesNotMatch(app, /New poll/);
-  assert.match(app, /Create poll/);
+  assert.match(app, /Create Poll/);
   assert.doesNotMatch(app, /landing-footer/);
   assert.match(app, /Event name <span className="required-marker">\*<\/span>/);
   assert.match(app, /Your name <span className="required-marker">\*<\/span>/);
