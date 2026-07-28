@@ -734,7 +734,6 @@ function PollView({ pollId }: { pollId: string }) {
           {brand}
         </Link>
         <div className="nav-actions">
-          <span className="no-account-pill">No account needed</span>
           <button className="share-button" type="button" onClick={copyLink}>
             Copy poll link <span aria-hidden="true">↗</span>
           </button>
