@@ -5,7 +5,6 @@ import {
   FormEvent,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
@@ -377,7 +376,7 @@ function CreatePoll() {
     <main className="create-page">
       <nav className="topbar create-nav">
         {brand}
-        <Link href="/p/sample" className="text-link">
+        <Link href="/sample" className="text-link">
           View a sample
         </Link>
       </nav>
@@ -990,12 +989,6 @@ export default function DoodleApp({
 }: {
   initialPollId: string | null;
 }) {
-  const [pollId] = useState<string | null>(initialPollId);
-
-  const page = useMemo(() => {
-    if (pollId) return <PollView pollId={pollId} />;
-    return <CreatePoll />;
-  }, [pollId]);
-
-  return page;
+  if (initialPollId) return <PollView pollId={initialPollId} />;
+  return <CreatePoll />;
 }
