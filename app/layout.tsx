@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title =
     "doodlebutwithoutfuckingads — find a time, skip the circus";
   const description =
-    "A tiny group scheduler with no accounts, no ads, and no email gate.";
+    "a truly tiny group scheduler with no accounts, no ads, and no bullshit 😇";
 
   return {
     metadataBase: origin,

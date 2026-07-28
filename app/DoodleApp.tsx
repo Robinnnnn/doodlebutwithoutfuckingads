@@ -223,8 +223,8 @@ function CreatePoll() {
             <em>Skip the circus.</em>
           </h1>
           <p className="hero-subtitle">
-            A tiny group scheduler with no accounts, no ads, and nothing
-            between your friends and a decision.
+            a truly tiny group scheduler with no accounts, no ads, and no
+            bullshit 😇
           </p>
           <div
             className="promise-row"
