@@ -55,7 +55,6 @@ const brand = (
 );
 
 const draftStorageKey = "doodlebutwithoutfuckingads:create-draft";
-const legacyDraftStorageKey = "meetmint:create-draft";
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -127,9 +126,7 @@ function CreatePoll() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const saved =
-      localStorage.getItem(draftStorageKey) ||
-      localStorage.getItem(legacyDraftStorageKey);
+    const saved = localStorage.getItem(draftStorageKey);
     if (!saved) return;
     try {
       const parsed = JSON.parse(saved) as CreateDraft;
@@ -137,12 +134,9 @@ function CreatePoll() {
         // Restore the device-local draft after hydration.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setDraft(parsed);
-        localStorage.setItem(draftStorageKey, saved);
-        localStorage.removeItem(legacyDraftStorageKey);
       }
     } catch {
       localStorage.removeItem(draftStorageKey);
-      localStorage.removeItem(legacyDraftStorageKey);
     }
   }, []);
 
@@ -200,7 +194,6 @@ function CreatePoll() {
         throw new Error(payload.error || "The poll could not be created.");
       }
       localStorage.removeItem(draftStorageKey);
-      localStorage.removeItem(legacyDraftStorageKey);
       window.location.href = `/p/${payload.id}?created=1`;
     } catch (caught) {
       setError(
@@ -238,7 +231,7 @@ function CreatePoll() {
             aria-label="doodlebutwithoutfuckingads benefits"
           >
             <span>✦ No sign-up</span>
-            <span>✦ No email required</span>
+            <span>✦ No email gate</span>
             <span>✦ No past times</span>
           </div>
         </div>
@@ -394,7 +387,6 @@ function PollView({ pollId }: { pollId: string }) {
   const [notice, setNotice] = useState("");
 
   const storageKey = `doodlebutwithoutfuckingads:response:${pollId}`;
-  const legacyStorageKey = `meetmint:response:${pollId}`;
 
   useEffect(() => {
     let stored: StoredResponse = {
@@ -403,23 +395,18 @@ function PollView({ pollId }: { pollId: string }) {
       selectedIds: [],
       submitted: false,
     };
-    const raw =
-      localStorage.getItem(storageKey) ||
-      localStorage.getItem(legacyStorageKey);
+    const raw = localStorage.getItem(storageKey);
     if (raw) {
       try {
         stored = { ...stored, ...(JSON.parse(raw) as StoredResponse) };
-        localStorage.setItem(storageKey, raw);
-        localStorage.removeItem(legacyStorageKey);
       } catch {
         localStorage.removeItem(storageKey);
-        localStorage.removeItem(legacyStorageKey);
       }
     }
     // Restore this browser's anonymous voter token after hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setResponse(stored);
-  }, [legacyStorageKey, storageKey]);
+  }, [storageKey]);
 
   const loadPoll = useCallback(
     async (token: string) => {
@@ -731,7 +718,7 @@ function PollView({ pollId }: { pollId: string }) {
                 <span>{saving ? "Saving…" : response.submitted ? "Update response" : "Submit response"}</span>
                 <span aria-hidden="true">→</span>
               </button>
-              <p>Your name is only shown to this group. No email. No account.</p>
+              <p>Your name is only shown to this group. No email gate. No account.</p>
             </div>
           )}
         </form>

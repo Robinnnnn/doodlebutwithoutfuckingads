@@ -13,8 +13,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "meetmint-db",
-      "database_id": "c7ab4a16-0f1d-48b4-ac4a-d5e6027160a4",
+      "database_name": "doodlebutwithoutfuckingads-db",
+      "database_id": "4fa43e90-beb4-44c2-b95d-3895cd2606fa",
       "migrations_dir": "./drizzle"
     }
   ],
