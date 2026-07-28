@@ -1,0 +1,534 @@
+.vl-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 7% 12%, rgba(216, 238, 112, 0.44), transparent 25%),
+    var(--cream);
+}
+
+.vl-shell {
+  width: min(680px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 8px 0 100px;
+}
+
+.vl-lab-pill {
+  border: 1px solid rgba(27, 42, 36, 0.3);
+  border-radius: 999px;
+  padding: 7px 14px;
+  color: #3d4c46;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vl-title {
+  margin: 10px 0 22px;
+  font-size: clamp(30px, 4.4vw, 44px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.vl-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.vl-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(27, 42, 36, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 750;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.vl-tab span {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+
+.vl-tab.active {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.vl-blurb {
+  max-width: 620px;
+  margin: 0 0 8px;
+  color: #52605a;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.vl-note {
+  margin: 0 0 26px;
+  color: #35735d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vl-card {
+  margin-top: 4px;
+}
+
+/* Reuse the create-card field styling for the shared detail fields. */
+.vl-field {
+  display: grid;
+  gap: 5px;
+  color: #53605a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.vl-field + .vl-field,
+.vl-field + .two-fields,
+.two-fields + .vl-field {
+  margin-top: 22px;
+}
+
+.vl-field input,
+.vl-card input,
+.vl-card select {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #cdd4ce;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  padding: 0 15px;
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.vl-field input::placeholder {
+  color: #a2aaa5;
+}
+
+.vl-field input:focus,
+.vl-card input:focus,
+.vl-card select:focus {
+  border-color: #36705c;
+  box-shadow: 0 0 0 3px rgba(168, 230, 202, 0.34);
+}
+
+/* The section replaces .form-divider + .time-heading. */
+.vl-section {
+  margin-top: 38px;
+  border-top: 1px solid #e3e5e1;
+  padding-top: 26px;
+}
+
+.vl-length-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 18px;
+  color: #3d4c46;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.vl-length-line select {
+  width: auto;
+  height: 38px;
+  padding: 0 28px 0 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Variant 1 — polished list */
+.vl-slot-list {
+  display: grid;
+  gap: 12px;
+}
+
+.vl-slot {
+  display: grid;
+  grid-template-columns: 1fr 34px;
+  grid-template-areas:
+    "input remove"
+    "hint hint";
+  gap: 2px 9px;
+  align-items: center;
+}
+
+.vl-slot input {
+  grid-area: input;
+  height: 48px;
+  color-scheme: light;
+}
+
+.vl-slot .icon-button {
+  grid-area: remove;
+}
+
+.vl-slot:not(:has(.icon-button)) {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "input"
+    "hint";
+}
+
+.vl-slot-hint {
+  grid-area: hint;
+  padding-left: 2px;
+  color: #708078;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vl-add {
+  width: 100%;
+  margin-top: 12px;
+  border: 1.5px dashed #9fb4a9;
+  border-radius: 12px;
+  background: transparent;
+  color: #2b654f;
+  cursor: pointer;
+  padding: 13px;
+  font-size: 13px;
+  font-weight: 800;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.vl-add:hover {
+  border-color: #2b654f;
+  background: var(--mint-soft);
+}
+
+/* Variant 2 + 4 — slot chips */
+.vl-chip-list {
+  display: grid;
+  gap: 10px;
+}
+
+.vl-chip {
+  border: 1px solid #cdd4ce;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.vl-chip.open {
+  border-color: #36705c;
+  box-shadow: 0 0 0 3px rgba(168, 230, 202, 0.34);
+}
+
+.vl-chip-face {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.vl-chip-face.static {
+  cursor: default;
+}
+
+.vl-chip-when {
+  display: grid;
+  gap: 2px;
+}
+
+.vl-chip-when strong {
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.vl-chip-when span {
+  color: #69746f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.vl-chip-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.vl-chip-edit {
+  color: #2b654f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.vl-chip-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #eff1ed;
+  color: #69746f;
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.vl-chip-remove:hover {
+  background: #fdeae4;
+  color: #9f3f29;
+}
+
+.vl-chip-editor {
+  border-top: 1px solid #eceeeb;
+  padding: 12px 16px 16px;
+}
+
+.vl-chip-editor input {
+  height: 46px;
+  color-scheme: light;
+}
+
+/* Variant 3 — calendar-first */
+.vl-cal {
+  margin-top: 14px;
+  border: 1px solid #d9ded9;
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px;
+}
+
+.vl-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.vl-cal-head strong {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.vl-cal-nav {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #cdd4ce;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.vl-cal-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.vl-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.vl-cal-dow {
+  color: #88938e;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.vl-cal-day {
+  aspect-ratio: 1.15;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.vl-cal-day:hover:not(:disabled):not(.selected) {
+  border-color: #9fb4a9;
+  background: var(--mint-soft);
+}
+
+.vl-cal-day.selected {
+  background: var(--green);
+  color: #fff;
+  font-weight: 800;
+}
+
+.vl-cal-day:disabled {
+  color: #b9c1bc;
+  cursor: default;
+}
+
+.vl-cal-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 18px 28px;
+  margin: 20px 0 4px;
+}
+
+.vl-inline-field {
+  display: grid;
+  gap: 6px;
+  color: #53605a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.vl-inline-field select {
+  width: auto;
+  height: 40px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.vl-segments {
+  display: inline-flex;
+  border: 1px solid #cdd4ce;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.vl-segments button {
+  border: 0;
+  border-right: 1px solid #eceeeb;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 14px;
+  height: 40px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vl-segments button:last-child {
+  border-right: 0;
+}
+
+.vl-segments button.active {
+  background: var(--green);
+  color: #fff;
+}
+
+.vl-cal-settings + .vl-chip-list {
+  margin-top: 18px;
+}
+
+/* Variant 4 — two-step flow */
+.vl-progress {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 26px;
+}
+
+.vl-progress-dot {
+  width: 9px;
+  height: 9px;
+  border: 1px solid #9fb4a9;
+  border-radius: 50%;
+}
+
+.vl-progress-dot.active {
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.vl-progress-label {
+  margin-left: 6px;
+  color: #708078;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vl-step-context {
+  margin: 6px 0 0;
+  color: #69746f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.vl-navrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.vl-navrow .primary-button {
+  flex: 1;
+}
+
+.vl-back {
+  border: 0;
+  background: transparent;
+  color: #3d4c46;
+  cursor: pointer;
+  padding: 10px 4px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.vl-create {
+  width: 100%;
+  margin-top: 28px;
+}
+
+@media (max-width: 560px) {
+  .vl-cal-settings {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vl-navrow {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .vl-back {
+    text-align: center;
+  }
+}
