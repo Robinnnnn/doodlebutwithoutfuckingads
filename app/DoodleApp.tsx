@@ -166,6 +166,66 @@ function IconGrid() {
   );
 }
 
+function IconArrowUpRight() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 14L14 4M7 4h7v7"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconArrowRight() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2.5 8h11M9.5 4l4 4-4 4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconChevron({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d={direction === "left" ? "M10 3.5L5.5 8l4.5 4.5" : "M6 3.5L10.5 8 6 12.5"}
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const draftStorageKey = "doodlebutwithoutfuckingads:create-draft";
 
 function pad(value: number) {
@@ -725,7 +785,7 @@ function CreatePoll() {
                         )
                       }
                     >
-                      ←
+                      <IconChevron direction="left" />
                     </button>
                     <strong>
                       {calendarMonthFormatter.format(
@@ -741,7 +801,7 @@ function CreatePoll() {
                         )
                       }
                     >
-                      →
+                      <IconChevron direction="right" />
                     </button>
                   </div>
 
@@ -838,7 +898,7 @@ function CreatePoll() {
             <span>
               {creating ? "Making your poll…" : "Create Poll"}
             </span>
-            <span aria-hidden="true">↗</span>
+            <IconArrowUpRight />
           </button>
         </form>
       </section>
@@ -1049,7 +1109,7 @@ function PollView({ pollId }: { pollId: string }) {
           <h1>This poll took a wrong turn.</h1>
           <p>The link may be incomplete, or the poll is no longer available.</p>
           <Link className="primary-button" href="/">
-            Make a new poll <span>↗</span>
+            Make a new poll <IconArrowUpRight />
           </Link>
         </section>
       </main>
@@ -1459,7 +1519,7 @@ function PollView({ pollId }: { pollId: string }) {
                     Saving…
                   </span>
                 </span>
-                <span aria-hidden="true">→</span>
+                <IconArrowRight />
               </button>
               <p>
                 Your name is only shown to this group. No emails. No

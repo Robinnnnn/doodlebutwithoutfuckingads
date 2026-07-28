@@ -20,6 +20,9 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   );
   assert.doesNotMatch(app, /New poll/);
   assert.match(app, /Create Poll/);
+  assert.match(app, /function IconArrowUpRight/);
+  assert.match(app, /<IconArrowUpRight \/>/);
+  assert.doesNotMatch(app, /[↗→←]/);
   assert.match(app, /className="text-link desktop-sample-link"/);
   assert.match(app, /bullshit 😇\{" "\}[\s\S]*className="mobile-sample-link"/);
   assert.match(app, /Copy poll link\s*<IconCopy \/>/);
