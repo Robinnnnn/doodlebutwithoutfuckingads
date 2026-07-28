@@ -874,7 +874,9 @@ function PollView({ pollId }: { pollId: string }) {
                       </div>
                       <span>
                         {option.voteCount
-                          ? `${option.voteCount} yes`
+                          ? `${option.voteCount} ${
+                              option.voteCount === 1 ? "vote" : "votes"
+                            }`
                           : "No votes yet"}
                       </span>
                     </div>
