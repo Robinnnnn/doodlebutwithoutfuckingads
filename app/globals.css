@@ -887,9 +887,14 @@ a {
 
 .name-entry {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  max-width: 560px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 14px;
+  align-items: center;
+  width: 100%;
+}
+
+.name-entry label {
+  min-width: 0;
 }
 
 .name-entry label > span {
@@ -905,6 +910,7 @@ a {
 
 .name-entry .primary-button {
   min-width: 190px;
+  justify-self: end;
 }
 
 .name-entry > p {
