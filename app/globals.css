@@ -1200,10 +1200,8 @@ a {
   }
 
   .poll-shell {
-    width: 100%;
+    width: min(100% - 28px, 1180px);
     margin: 4px auto 48px;
-    border-right: 0;
-    border-left: 0;
     border-radius: 24px;
   }
 
