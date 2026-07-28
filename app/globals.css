@@ -682,14 +682,10 @@ a {
 }
 
 .meta-icon {
-  display: grid;
-  place-items: center;
-  width: 25px;
-  height: 25px;
-  border: 1px solid #cbd3cd;
-  border-radius: 50%;
-  color: #376653;
+  flex: 0 0 auto;
+  color: var(--coral);
   font-size: 13px;
+  line-height: 1;
 }
 
 .poll-note {

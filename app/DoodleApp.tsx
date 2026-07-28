@@ -758,12 +758,16 @@ function PollView({ pollId }: { pollId: string }) {
           <div className="poll-meta">
             {poll.location && (
               <div>
-                <span className="meta-icon">⌖</span>
+                <span className="meta-icon" aria-hidden="true">
+                  ✦
+                </span>
                 <span>{poll.location}</span>
               </div>
             )}
             <div>
-              <span className="meta-icon">◷</span>
+              <span className="meta-icon" aria-hidden="true">
+                ✦
+              </span>
               <span>{durationLabel(poll.durationMinutes)}</span>
             </div>
           </div>
