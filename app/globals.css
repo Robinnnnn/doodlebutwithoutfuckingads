@@ -210,6 +210,18 @@ a {
   transform: translateX(-50%) rotate(-2deg);
 }
 
+.create-card::after {
+  content: "";
+  position: absolute;
+  width: 112px;
+  height: 24px;
+  bottom: -15px;
+  left: 50%;
+  background: rgba(255, 142, 110, 0.34);
+  transform: translateX(-50%) rotate(3deg);
+  pointer-events: none;
+}
+
 .form-heading,
 .time-heading,
 .response-label {
@@ -611,6 +623,19 @@ a {
   left: 50%;
   background: rgba(216, 238, 112, 0.7);
   transform: translateX(-50%) rotate(2deg);
+  pointer-events: none;
+}
+
+.poll-shell::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 124px;
+  height: 22px;
+  bottom: -11px;
+  left: 50%;
+  background: rgba(216, 238, 112, 0.7);
+  transform: translateX(-50%) rotate(-3deg);
   pointer-events: none;
 }
 
