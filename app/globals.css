@@ -589,16 +589,25 @@ a {
 .share-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
   height: 39px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--green);
   border-radius: 999px;
-  background: transparent;
+  background: var(--green);
   cursor: pointer;
   padding: 0 16px;
-  color: var(--ink);
+  color: #fff;
   font-size: 11px;
   font-weight: 750;
+  transition:
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.share-button:hover {
+  background: #0c3f2e;
+  transform: translateY(-1px);
 }
 
 .poll-shell {
