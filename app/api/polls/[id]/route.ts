@@ -63,18 +63,8 @@ export async function GET(
     await ensureSchema();
     const { id } = await context.params;
     const localDev = isLocalDevRequest(request);
-    // Always rebuild sample so it tracks form defaults; on prod also
-    // wipe votes so visitors don't see each other.
-    if (id === "sample") {
-      if (!localDev) {
-        await ensureSamplePoll();
-      } else {
-        const existing = await getD1()
-          .prepare("SELECT id FROM polls WHERE id = 'sample'")
-          .first();
-        if (!existing) await ensureSamplePoll();
-      }
-    }
+    // Rebuild sample so copy/times always match the create form defaults.
+    if (id === "sample") await ensureSamplePoll();
 
     const db = getD1();
     const poll = await db
