@@ -369,7 +369,7 @@ function CreatePoll() {
           </div>
 
           <div className="form-section">
-            <p className="micro-label">Pick some times</p>
+            <p className="section-label">Pick some times</p>
             <div className="slot-chip-list">
               {!ready
                 ? [0, 1].map((index) => (
