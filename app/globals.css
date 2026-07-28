@@ -350,6 +350,21 @@ a {
   box-shadow: 0 0 0 3px rgba(168, 230, 202, 0.34);
 }
 
+.slot-chip-skeleton {
+  pointer-events: none;
+}
+
+.slot-chip-skeleton .slot-chip-when {
+  width: 55%;
+  border-radius: 6px;
+  background: #eceeeb;
+}
+
+.slot-chip-skeleton .slot-chip-face {
+  cursor: default;
+  min-height: 62px;
+}
+
 .slot-chip-row {
   display: flex;
   align-items: stretch;

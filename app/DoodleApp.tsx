@@ -163,36 +163,45 @@ function CreatePoll() {
     location: "",
     note: "",
     durationMinutes: 120,
-    options: initialTimes(),
+    options: [],
   });
+  const [ready, setReady] = useState(false);
+  const [titlePlaceholder, setTitlePlaceholder] = useState("Craft night");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState<number | null>(null);
 
   useEffect(() => {
+    // Dates, local timezone, and locale formatting only exist on the client.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTitlePlaceholder(nextMonthCraftNight());
     const saved = localStorage.getItem(draftStorageKey);
-    if (!saved) return;
-    try {
-      const parsed = JSON.parse(saved) as CreateDraft;
-      if (parsed.options?.length) {
-        const known = CREATE_DURATIONS.some(
-          (item) => item.value === parsed.durationMinutes,
-        );
-        // Restore the device-local draft after hydration.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setDraft({
-          ...parsed,
-          durationMinutes: known ? parsed.durationMinutes : 120,
-        });
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as CreateDraft;
+        if (parsed.options?.length) {
+          const known = CREATE_DURATIONS.some(
+            (item) => item.value === parsed.durationMinutes,
+          );
+          setDraft({
+            ...parsed,
+            durationMinutes: known ? parsed.durationMinutes : 120,
+          });
+          setReady(true);
+          return;
+        }
+      } catch {
+        localStorage.removeItem(draftStorageKey);
       }
-    } catch {
-      localStorage.removeItem(draftStorageKey);
     }
+    setDraft((current) => ({ ...current, options: initialTimes() }));
+    setReady(true);
   }, []);
 
   useEffect(() => {
+    if (!ready) return;
     localStorage.setItem(draftStorageKey, JSON.stringify(draft));
-  }, [draft]);
+  }, [draft, ready]);
 
   function update<K extends keyof CreateDraft>(
     key: K,
@@ -313,7 +322,7 @@ function CreatePoll() {
               <input
                 value={draft.title}
                 onChange={(event) => update("title", event.target.value)}
-                placeholder={nextMonthCraftNight()}
+                placeholder={titlePlaceholder}
                 autoComplete="off"
                 required
               />
@@ -362,81 +371,106 @@ function CreatePoll() {
           <div className="form-section">
             <p className="micro-label">Pick some times</p>
             <div className="slot-chip-list">
-              {draft.options.map((option, index) => {
-                const label = formatSlotRange(option, draft.durationMinutes);
-                const open = editing === index;
-                return (
-                  <div
-                    className={`slot-chip ${open ? "open" : ""}`}
-                    key={index}
-                  >
-                    <div className="slot-chip-row">
-                      <button
-                        type="button"
-                        className="slot-chip-face"
-                        onClick={() => setEditing(open ? null : index)}
-                        aria-expanded={open}
-                      >
-                        {label ? (
+              {!ready
+                ? [0, 1].map((index) => (
+                    <div
+                      className="slot-chip slot-chip-skeleton"
+                      key={index}
+                      aria-hidden="true"
+                    >
+                      <div className="slot-chip-row">
+                        <div className="slot-chip-face">
                           <span className="slot-chip-when">
-                            <strong>{label.day}</strong>
-                            <span>{label.time}</span>
+                            <strong>&nbsp;</strong>
+                            <span>&nbsp;</span>
                           </span>
-                        ) : (
-                          <span className="slot-chip-when">
-                            <strong>Pick a date & time</strong>
-                          </span>
-                        )}
-                        <span className="slot-chip-edit">
-                          {open ? "Done" : "Edit"}
-                        </span>
-                      </button>
-                      {draft.options.length > 2 && (
-                        <button
-                          type="button"
-                          className="slot-chip-remove"
-                          aria-label={`Remove time option ${index + 1}`}
-                          onClick={() => removeOption(index)}
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
-                    {open && (
-                      <div className="slot-chip-editor">
-                        <input
-                          aria-label={`Edit time option ${index + 1}`}
-                          type={
-                            draft.durationMinutes >= 1440
-                              ? "date"
-                              : "datetime-local"
-                          }
-                          value={
-                            draft.durationMinutes >= 1440
-                              ? option.slice(0, 10)
-                              : option
-                          }
-                          min={
-                            draft.durationMinutes >= 1440
-                              ? toLocalInput(new Date()).slice(0, 10)
-                              : toLocalInput(new Date())
-                          }
-                          onChange={(event) => {
-                            const next =
-                              draft.durationMinutes >= 1440
-                                ? `${event.target.value}T00:00`
-                                : event.target.value;
-                            updateOption(index, next);
-                          }}
-                        />
+                        </div>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    </div>
+                  ))
+                : draft.options.map((option, index) => {
+                    const label = formatSlotRange(
+                      option,
+                      draft.durationMinutes,
+                    );
+                    const open = editing === index;
+                    return (
+                      <div
+                        className={`slot-chip ${open ? "open" : ""}`}
+                        key={index}
+                      >
+                        <div className="slot-chip-row">
+                          <button
+                            type="button"
+                            className="slot-chip-face"
+                            onClick={() => setEditing(open ? null : index)}
+                            aria-expanded={open}
+                          >
+                            {label ? (
+                              <span className="slot-chip-when">
+                                <strong>{label.day}</strong>
+                                <span>{label.time}</span>
+                              </span>
+                            ) : (
+                              <span className="slot-chip-when">
+                                <strong>Pick a date & time</strong>
+                              </span>
+                            )}
+                            <span className="slot-chip-edit">
+                              {open ? "Done" : "Edit"}
+                            </span>
+                          </button>
+                          {draft.options.length > 2 && (
+                            <button
+                              type="button"
+                              className="slot-chip-remove"
+                              aria-label={`Remove time option ${index + 1}`}
+                              onClick={() => removeOption(index)}
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                        {open && (
+                          <div className="slot-chip-editor">
+                            <input
+                              aria-label={`Edit time option ${index + 1}`}
+                              type={
+                                draft.durationMinutes >= 1440
+                                  ? "date"
+                                  : "datetime-local"
+                              }
+                              value={
+                                draft.durationMinutes >= 1440
+                                  ? option.slice(0, 10)
+                                  : option
+                              }
+                              min={
+                                draft.durationMinutes >= 1440
+                                  ? toLocalInput(new Date()).slice(0, 10)
+                                  : toLocalInput(new Date())
+                              }
+                              onChange={(event) => {
+                                const next =
+                                  draft.durationMinutes >= 1440
+                                    ? `${event.target.value}T00:00`
+                                    : event.target.value;
+                                updateOption(index, next);
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
             </div>
 
-            <button type="button" className="add-slot" onClick={addOption}>
+            <button
+              type="button"
+              className="add-slot"
+              onClick={addOption}
+              disabled={!ready}
+            >
               <span aria-hidden="true">＋</span> Add another time
             </button>
           </div>
