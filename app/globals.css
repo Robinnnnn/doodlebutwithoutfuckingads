@@ -253,8 +253,7 @@ a {
 }
 
 .form-heading h2,
-.time-heading h3,
-.response-label h2 {
+.time-heading h3 {
   margin: 0;
   font-size: 20px;
   line-height: 1.2;
@@ -886,19 +885,24 @@ a {
 
 .response-bar {
   display: grid;
-  grid-template-columns: 0.74fr 1.26fr;
-  gap: 40px;
-  align-items: center;
+  gap: 20px;
   border-top: 1px solid #dfe3de;
   border-radius: 0 0 30px 30px;
   background: var(--paper);
   padding: 36px 72px;
 }
 
+.response-heading {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
 .name-entry {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 10px;
+  max-width: 560px;
 }
 
 .name-entry label > span {

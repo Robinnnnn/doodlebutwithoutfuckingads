@@ -831,13 +831,11 @@ function PollView({ pollId }: { pollId: string }) {
         </section>
 
         <form className="response-bar" onSubmit={saveResponse}>
-          <div className="response-label">
-            <h2>
-              {response.submitted && !editing
-                ? "Your response is saved."
-                : "Who’s voting?"}
-            </h2>
-          </div>
+          <h2 className="response-heading">
+            {response.submitted && !editing
+              ? "Your response is saved."
+              : "Who are you?"}
+          </h2>
 
           {response.submitted && !editing ? (
             <div className="saved-response">
@@ -877,10 +875,19 @@ function PollView({ pollId }: { pollId: string }) {
                 className="primary-button"
                 disabled={saving || poll.options.length === 0}
               >
-                <span>{saving ? "Saving…" : response.submitted ? "Update response" : "Submit response"}</span>
+                <span>
+                  {saving
+                    ? "Saving…"
+                    : response.submitted
+                      ? "Update response"
+                      : "Submit response"}
+                </span>
                 <span aria-hidden="true">→</span>
               </button>
-              <p>Your name is only shown to this group. No email gate. No account.</p>
+              <p>
+                Your name is only shown to this group. No email gate. No
+                account.
+              </p>
             </div>
           )}
         </form>
