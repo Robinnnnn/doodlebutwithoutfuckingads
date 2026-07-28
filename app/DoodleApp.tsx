@@ -571,6 +571,12 @@ function PollView({ pollId }: { pollId: string }) {
   const storageKey = `doodlebutwithoutfuckingads:response:${pollId}`;
 
   useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(""), 3200);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  useEffect(() => {
     let stored: StoredResponse = {
       token: makeToken(),
       name: "",
