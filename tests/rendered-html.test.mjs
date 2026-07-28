@@ -16,6 +16,7 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   assert.match(app, /Skip the circus\./);
   assert.match(app, /<strong>fucking<\/strong><b>ads<\/b>/);
   assert.match(app, /Create & get the link/);
+  assert.doesNotMatch(app, /landing-footer/);
   assert.match(app, /No email gate\. No account\./);
   assert.match(
     layout,

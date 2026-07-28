@@ -431,7 +431,6 @@ a {
   margin-top: 28px;
 }
 
-.landing-footer,
 .poll-footer {
   width: min(1180px, calc(100% - 48px));
   min-height: 80px;
@@ -998,7 +997,6 @@ a {
 @media (max-width: 640px) {
   .topbar,
   .create-hero,
-  .landing-footer,
   .poll-footer {
     width: min(100% - 28px, 1180px);
   }
@@ -1052,14 +1050,6 @@ a {
 
   .duration-field {
     width: 110px;
-  }
-
-  .landing-footer {
-    min-height: 72px;
-  }
-
-  .landing-footer span:last-child {
-    display: none;
   }
 
   .poll-shell {

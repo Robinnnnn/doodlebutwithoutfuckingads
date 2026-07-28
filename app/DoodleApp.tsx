@@ -369,11 +369,6 @@ function CreatePoll() {
           </button>
         </form>
       </section>
-
-      <footer className="landing-footer">
-        <span>Exactly what it says on the tin.</span>
-        <span>Made for humans who just need a time.</span>
-      </footer>
     </main>
   );
 }
