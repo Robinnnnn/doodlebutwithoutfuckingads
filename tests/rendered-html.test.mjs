@@ -34,6 +34,11 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   assert.match(packageJson, /"name": "doodlebutwithoutfuckingads"/);
   assert.match(worker, /www\.doodlebutwithoutfuckingads\.com/);
   assert.match(worker, /Response\.redirect\(url, 308\)/);
+  assert.match(worker, /rateLimitApiRequest/);
+  assert.match(worker, /pathname === "\/api\/polls"/);
+  assert.match(worker, /POLL_CREATE_RATE_LIMITER/);
+  assert.match(worker, /POLL_READ_RATE_LIMITER/);
+  assert.match(worker, /POLL_RESPONSE_RATE_LIMITER/);
   assert.match(wrangler, /"pattern": "doodlebutwithoutfuckingads\.com"/);
   assert.match(wrangler, /"pattern": "www\.doodlebutwithoutfuckingads\.com"/);
 
