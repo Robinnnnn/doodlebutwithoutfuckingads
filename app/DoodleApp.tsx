@@ -745,14 +745,6 @@ function PollView({ pollId }: { pollId: string }) {
           <div className="poll-title-block">
             <p className="eyebrow">You’re invited</p>
             <h1>{poll.title}</h1>
-            <div className="host-line">
-              <span className="avatar host-avatar">
-                {initials(poll.organizer)}
-              </span>
-              <span>
-                Organized by <strong>{poll.organizer}</strong>
-              </span>
-            </div>
           </div>
           <div className="poll-meta">
             {poll.location && (
@@ -768,6 +760,12 @@ function PollView({ pollId }: { pollId: string }) {
                 ✦
               </span>
               <span>{durationLabel(poll.durationMinutes)}</span>
+            </div>
+            <div>
+              <span className="meta-icon" aria-hidden="true">
+                ✦
+              </span>
+              <span>Organized by {poll.organizer}</span>
             </div>
           </div>
           {poll.note && <p className="poll-note">“{poll.note}”</p>}
