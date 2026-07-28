@@ -805,7 +805,7 @@ function PollView({ pollId }: { pollId: string }) {
             type="button"
             onClick={copyLink}
           >
-            Copy poll link
+            Share poll
             <IconCopy />
           </button>
         </div>
