@@ -638,26 +638,44 @@ function PollView({ pollId }: { pollId: string }) {
         }
         const data = (await request.json()) as Poll;
         setPoll(data);
+        const mine = data.myResponse;
         setResponse((current) => {
           if (!current) return current;
-          if (!data.myResponse) return current;
+          if (!mine) return current;
           return {
             ...current,
-            name: data.myResponse.name,
-            selectedIds: data.myResponse.optionIds,
+            name: mine.name,
+            selectedIds: mine.optionIds,
             submitted: true,
           };
         });
-        setNoneChosen(
-          Boolean(data.myResponse && data.myResponse.optionIds.length === 0),
-       );
-        setEditing(!data.myResponse);
+        if (mine) {
+          setNoneChosen(mine.optionIds.length === 0);
+          setEditing(false);
+        } else {
+          // Keep a locally-saved sample vote when the server is ephemeral.
+          try {
+            const raw = localStorage.getItem(storageKey);
+            const stored = raw
+              ? (JSON.parse(raw) as StoredResponse)
+              : null;
+            setEditing(!stored?.submitted);
+            setNoneChosen(
+              Boolean(
+                stored?.submitted && stored.selectedIds.length === 0,
+              ),
+            );
+          } catch {
+            setEditing(true);
+            setNoneChosen(false);
+          }
+        }
         setStatus("ready");
       } catch {
         setStatus("missing");
       }
     },
-    [pollId],
+    [pollId, storageKey],
   );
 
   useEffect(() => {

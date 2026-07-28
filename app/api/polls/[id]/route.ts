@@ -1,4 +1,8 @@
 import { ensureSchema, getD1 } from "../../../../db";
+import {
+  isLocalDevRequest,
+  samplePollDefaults,
+} from "../../../../lib/sample-poll";
 
 type PollRow = {
   id: string;
@@ -19,32 +23,32 @@ type OptionRow = {
 
 async function ensureSamplePoll() {
   const db = getD1();
-  const existing = await db
-    .prepare("SELECT id FROM polls WHERE id = 'sample'")
-    .first();
-  if (existing) return;
-
-  const now = new Date();
-  const first = new Date(now);
-  first.setDate(first.getDate() + ((6 - first.getDay() + 7) % 7 || 7));
-  first.setHours(18, 0, 0, 0);
-  const dates = [0, 1, 7, 8, 14, 15].map((offset) => {
-    const date = new Date(first);
-    date.setDate(date.getDate() + offset);
-    return date.toISOString();
-  });
+  const defaults = samplePollDefaults();
 
   await db.batch([
     db
+      .prepare("DELETE FROM votes WHERE response_id IN (SELECT id FROM responses WHERE poll_id = 'sample')"),
+    db.prepare("DELETE FROM responses WHERE poll_id = 'sample'"),
+    db.prepare("DELETE FROM poll_options WHERE poll_id = 'sample'"),
+    db.prepare("DELETE FROM polls WHERE id = 'sample'"),
+    db
       .prepare(
-        `INSERT OR IGNORE INTO polls
+        `INSERT INTO polls
           (id, title, organizer, location, note, timezone, duration_minutes)
-         VALUES ('sample', 'August craft night', 'Gianna', 'The long table at Robin’s', 'Bring a project—or just bring yourself.', 'America/Los_Angeles', 240)`,
+         VALUES ('sample', ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        defaults.title,
+        defaults.organizer,
+        defaults.location,
+        defaults.note,
+        defaults.timezone,
+        defaults.durationMinutes,
       ),
-    ...dates.map((startsAt, index) =>
+    ...defaults.options.map((startsAt, index) =>
       db
         .prepare(
-          "INSERT OR IGNORE INTO poll_options (id, poll_id, starts_at) VALUES (?, 'sample', ?)",
+          "INSERT INTO poll_options (id, poll_id, starts_at) VALUES (?, 'sample', ?)",
         )
         .bind(`sample-${index + 1}`, startsAt),
     ),
@@ -58,7 +62,20 @@ export async function GET(
   try {
     await ensureSchema();
     const { id } = await context.params;
-    if (id === "sample") await ensureSamplePoll();
+    const localDev = isLocalDevRequest(request);
+    // Always rebuild sample so it tracks form defaults; on prod also
+    // wipe votes so visitors don't see each other.
+    if (id === "sample") {
+      if (!localDev) {
+        await ensureSamplePoll();
+      } else {
+        const existing = await getD1()
+          .prepare("SELECT id FROM polls WHERE id = 'sample'")
+          .first();
+        if (!existing) await ensureSamplePoll();
+      }
+    }
+
     const db = getD1();
     const poll = await db
       .prepare(
@@ -71,6 +88,8 @@ export async function GET(
     if (!poll) {
       return Response.json({ error: "Poll not found." }, { status: 404 });
     }
+
+    const ephemeralSample = id === "sample" && !localDev;
 
     const options = await db
       .prepare(
@@ -89,14 +108,16 @@ export async function GET(
       .bind(id, new Date().toISOString())
       .all<OptionRow>();
 
-    const responseCountRow = await db
-      .prepare("SELECT COUNT(*) AS count FROM responses WHERE poll_id = ?")
-      .bind(id)
-      .first<{ count: number }>();
+    const responseCountRow = ephemeralSample
+      ? { count: 0 }
+      : await db
+          .prepare("SELECT COUNT(*) AS count FROM responses WHERE poll_id = ?")
+          .bind(id)
+          .first<{ count: number }>();
 
     const token = new URL(request.url).searchParams.get("voter")?.slice(0, 100);
     let myResponse: { name: string; optionIds: string[] } | null = null;
-    if (token) {
+    if (token && !ephemeralSample) {
       const mine = await db
         .prepare(
           `SELECT r.name, v.option_id
@@ -131,10 +152,15 @@ export async function GET(
       options: options.results.map((option: OptionRow) => ({
         id: option.id,
         startsAt: option.starts_at,
-        voteCount: Number(option.vote_count || 0),
-        voters: option.voter_names ? option.voter_names.split("||") : [],
+        voteCount: ephemeralSample ? 0 : Number(option.vote_count || 0),
+        voters: ephemeralSample
+          ? []
+          : option.voter_names
+            ? option.voter_names.split("||")
+            : [],
       })),
       myResponse,
+      ephemeral: ephemeralSample || undefined,
     });
   } catch (error) {
     return Response.json(

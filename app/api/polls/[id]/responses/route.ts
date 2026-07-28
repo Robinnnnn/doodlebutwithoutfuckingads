@@ -1,4 +1,5 @@
 import { ensureSchema, getD1 } from "../../../../../db";
+import { isLocalDevRequest } from "../../../../../lib/sample-poll";
 
 type ResponsePayload = {
   token?: string;
@@ -29,6 +30,11 @@ export async function POST(
         { error: "A name is required to save this response." },
         { status: 400 },
       );
+    }
+
+    // Sample votes must not pile up for every visitor in production.
+    if (pollId === "sample" && !isLocalDevRequest(request)) {
+      return Response.json({ ok: true, ephemeral: true });
     }
 
     const db = getD1();

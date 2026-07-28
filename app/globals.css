@@ -626,7 +626,7 @@ a {
 .poll-shell {
   position: relative;
   width: min(1060px, calc(100% - 48px));
-  margin: 26px auto 80px;
+  margin: 26px auto 96px;
   border: 1px solid rgba(27, 42, 36, 0.16);
   border-radius: 30px;
   background: var(--paper);
@@ -898,7 +898,7 @@ a {
   border-top: 1px solid #dfe3de;
   border-radius: 0 0 30px 30px;
   background: var(--paper);
-  padding: 36px 72px;
+  padding: 36px 72px 48px;
 }
 
 .response-heading {
@@ -1201,10 +1201,10 @@ a {
 
   .poll-shell {
     width: 100%;
-    margin: 4px auto 0;
+    margin: 4px auto 48px;
     border-right: 0;
     border-left: 0;
-    border-radius: 24px 24px 0 0;
+    border-radius: 24px;
   }
 
   .poll-intro,
