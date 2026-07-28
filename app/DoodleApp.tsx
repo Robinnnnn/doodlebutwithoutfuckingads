@@ -745,7 +745,6 @@ function PollView({ pollId }: { pollId: string }) {
           <div className="poll-title-block">
             <p className="eyebrow">You’re invited</p>
             <h1>{poll.title}</h1>
-            {poll.note && <p className="poll-note">“{poll.note}”</p>}
           </div>
           <div className="poll-meta">
             {poll.location && (
@@ -769,6 +768,7 @@ function PollView({ pollId }: { pollId: string }) {
               <span>Organized by {poll.organizer}</span>
             </div>
           </div>
+          {poll.note && <p className="poll-note">“{poll.note}”</p>}
         </header>
 
         <section className="vote-section">
