@@ -624,7 +624,7 @@ a {
 }
 
 .poll-title-block h1 {
-  margin: 10px 0 25px;
+  margin: 10px 0 0;
   font-size: clamp(40px, 5vw, 66px);
   line-height: 1;
   letter-spacing: -0.055em;
@@ -689,8 +689,7 @@ a {
 }
 
 .poll-note {
-  grid-column: 1 / -1;
-  margin: 6px 0 0;
+  margin: 18px 0 0;
   border-left: 3px solid var(--lime);
   color: #59655f;
   padding: 3px 0 3px 17px;
