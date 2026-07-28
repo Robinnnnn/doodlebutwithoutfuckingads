@@ -7,6 +7,14 @@ import {
   useEffect,
   useState,
 } from "react";
+import {
+  calendarDays,
+  localDateFromKey,
+  localDateKey,
+  monthKeyForDate,
+  optionAtDefaultTime,
+  shiftMonth,
+} from "../lib/calendar";
 
 type AvailabilityStatus = "yes" | "if-needed";
 
@@ -241,6 +249,16 @@ const timeFormatter = new Intl.DateTimeFormat(undefined, {
   hour: "numeric",
   minute: "2-digit",
 });
+const calendarMonthFormatter = new Intl.DateTimeFormat(undefined, {
+  month: "long",
+  year: "numeric",
+});
+const calendarDayFormatter = new Intl.DateTimeFormat(undefined, {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
 
 function durationLabel(minutes: number) {
   if (minutes >= 1440) return "All day";
@@ -309,6 +327,9 @@ function CreatePoll() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState<number | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState("");
+  const [calendarSelection, setCalendarSelection] = useState<string[]>([]);
 
   useEffect(() => {
     // Dates, local timezone, and locale formatting only exist on the client.
@@ -389,18 +410,53 @@ function CreatePoll() {
     setEditing(null);
   }
 
-  function addOption() {
+  function openCalendar() {
+    if (calendarOpen) {
+      setCalendarOpen(false);
+      setCalendarSelection([]);
+      return;
+    }
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setCalendarMonth(monthKeyForDate(tomorrow));
+    setCalendarSelection([]);
+    setEditing(null);
+    setCalendarOpen(true);
+  }
+
+  function toggleCalendarDate(dateKey: string) {
+    setCalendarSelection((current) => {
+      if (current.includes(dateKey)) {
+        return current.filter((key) => key !== dateKey);
+      }
+      if (draft.options.length + current.length >= 30) return current;
+      return [...current, dateKey].sort();
+    });
+  }
+
+  function addCalendarDates() {
+    if (!calendarSelection.length) return;
     setDraft((current) => {
-      const options = sortOptions(current.options);
-      const base = options.at(-1) || toLocalInput(new Date());
+      const existing = new Set(
+        current.options.map((option) => option.slice(0, 10)),
+      );
+      const availableSlots = Math.max(0, 30 - current.options.length);
+      const additions = calendarSelection
+        .filter((dateKey) => !existing.has(dateKey))
+        .slice(0, availableSlots)
+        .map((dateKey) =>
+          optionAtDefaultTime(
+            dateKey,
+            current.durationMinutes >= 1440,
+          ),
+        );
       return {
         ...current,
-        options: sortOptions([
-          ...options,
-          toLocalInput(new Date(new Date(base).getTime() + 86_400_000)),
-        ]),
+        options: sortOptions([...current.options, ...additions]),
       };
     });
+    setCalendarSelection([]);
+    setCalendarOpen(false);
     setEditing(null);
   }
 
@@ -448,6 +504,15 @@ function CreatePoll() {
       setCreating(false);
     }
   }
+
+  const todayKey = localDateKey(new Date());
+  const currentMonthKey = monthKeyForDate(new Date());
+  const existingDateKeys = new Set(
+    draft.options.map((option) => option.slice(0, 10)),
+  );
+  const visibleCalendarDays =
+    calendarOpen && calendarMonth ? calendarDays(calendarMonth) : [];
+  const calendarSelectionSet = new Set(calendarSelection);
 
   return (
     <main className="create-page">
@@ -630,14 +695,129 @@ function CreatePoll() {
                   })}
             </div>
 
-            <button
-              type="button"
-              className="add-slot"
-              onClick={addOption}
-              disabled={!ready}
-            >
-              <span aria-hidden="true">＋</span> Add another time
-            </button>
+            <div className="calendar-picker-shell">
+              <button
+                type="button"
+                className="add-slot"
+                onClick={openCalendar}
+                disabled={!ready || draft.options.length >= 30}
+                aria-expanded={calendarOpen}
+                aria-controls="multi-date-calendar"
+              >
+                <span aria-hidden="true">{calendarOpen ? "×" : "＋"}</span>
+                {calendarOpen ? "Close calendar" : "Add another time"}
+              </button>
+
+              {calendarOpen && calendarMonth && (
+                <div
+                  className="calendar-picker"
+                  id="multi-date-calendar"
+                  aria-label="Choose future dates"
+                >
+                  <div className="calendar-picker-header">
+                    <button
+                      type="button"
+                      aria-label="Previous month"
+                      disabled={calendarMonth <= currentMonthKey}
+                      onClick={() =>
+                        setCalendarMonth((current) =>
+                          shiftMonth(current, -1),
+                        )
+                      }
+                    >
+                      ←
+                    </button>
+                    <strong>
+                      {calendarMonthFormatter.format(
+                        localDateFromKey(calendarMonth),
+                      )}
+                    </strong>
+                    <button
+                      type="button"
+                      aria-label="Next month"
+                      onClick={() =>
+                        setCalendarMonth((current) =>
+                          shiftMonth(current, 1),
+                        )
+                      }
+                    >
+                      →
+                    </button>
+                  </div>
+
+                  <div className="calendar-weekdays" aria-hidden="true">
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                      (weekday) => (
+                        <span key={weekday}>{weekday}</span>
+                      ),
+                    )}
+                  </div>
+
+                  <div className="calendar-days">
+                    {visibleCalendarDays.map((day) => {
+                      const existing = existingDateKeys.has(day.key);
+                      const selected = calendarSelectionSet.has(day.key);
+                      const unavailable = day.key <= todayKey;
+                      const label = calendarDayFormatter.format(day.date);
+                      return (
+                        <button
+                          type="button"
+                          className={[
+                            !day.inCurrentMonth ? "outside-month" : "",
+                            existing ? "existing" : "",
+                            selected ? "selected" : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          key={day.key}
+                          disabled={unavailable || existing}
+                          aria-label={`${label}${existing ? ", already added" : unavailable ? ", unavailable" : ""}`}
+                          aria-pressed={selected}
+                          onClick={() => toggleCalendarDate(day.key)}
+                        >
+                          <span>{day.date.getDate()}</span>
+                          {existing && <i aria-hidden="true" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="calendar-key">
+                    <span>
+                      <i className="calendar-key-existing" /> Already added
+                    </span>
+                    <span>
+                      <i className="calendar-key-selected" /> New selection
+                    </span>
+                  </div>
+
+                  <div className="calendar-picker-footer">
+                    <p>
+                      {calendarSelection.length
+                        ? `${calendarSelection.length} ${
+                            calendarSelection.length === 1 ? "date" : "dates"
+                          } selected`
+                        : draft.durationMinutes >= 1440
+                          ? "Choose one or more all-day dates."
+                          : "New dates start at 6:00 PM."}
+                    </p>
+                    <button
+                      type="button"
+                      className="calendar-submit"
+                      disabled={!calendarSelection.length}
+                      onClick={addCalendarDates}
+                    >
+                      Add{" "}
+                      {calendarSelection.length
+                        ? `${calendarSelection.length} ${
+                            calendarSelection.length === 1 ? "date" : "dates"
+                          }`
+                        : "dates"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-section">

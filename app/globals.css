@@ -498,6 +498,202 @@ a {
   margin-right: 6px;
 }
 
+.calendar-picker-shell {
+  position: relative;
+}
+
+.calendar-picker {
+  margin-top: 10px;
+  border: 1px solid #cdd4ce;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 14px 32px rgba(36, 61, 50, 0.09);
+  padding: 16px;
+}
+
+.calendar-picker-header {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.calendar-picker-header strong {
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+
+.calendar-picker-header button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d8ddd9;
+  border-radius: 50%;
+  background: #f8f7f2;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.calendar-picker-header button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.calendar-weekdays,
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 40px);
+  justify-content: space-between;
+}
+
+.calendar-weekdays {
+  margin-bottom: 5px;
+}
+
+.calendar-weekdays span {
+  color: #7e8883;
+  text-align: center;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.calendar-days {
+  row-gap: 5px;
+}
+
+.calendar-days button {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: #35443e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 750;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.calendar-days button:not(:disabled):hover {
+  border-color: #9ab4a7;
+  background: var(--mint-soft);
+  transform: translateY(-1px);
+}
+
+.calendar-days button:focus-visible,
+.calendar-picker-header button:focus-visible,
+.calendar-submit:focus-visible {
+  outline: 3px solid rgba(168, 230, 202, 0.58);
+  outline-offset: 2px;
+}
+
+.calendar-days button.outside-month {
+  color: #9da6a1;
+}
+
+.calendar-days button:disabled {
+  cursor: not-allowed;
+  color: #c4cac6;
+}
+
+.calendar-days button.existing {
+  border-color: #9ebd2b;
+  background: #f4f9d9;
+  color: #435319;
+  opacity: 1;
+}
+
+.calendar-days button.existing i {
+  position: absolute;
+  right: 5px;
+  bottom: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #88a91c;
+}
+
+.calendar-days button.selected {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.calendar-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 12px;
+  color: #6b7771;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.calendar-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.calendar-key i {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.calendar-key-existing {
+  border: 1px solid #9ebd2b;
+  background: #f4f9d9;
+}
+
+.calendar-key-selected {
+  background: var(--green);
+}
+
+.calendar-picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  border-top: 1px solid #eceeea;
+  padding-top: 14px;
+}
+
+.calendar-picker-footer p {
+  margin: 0;
+  color: #6b7771;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.calendar-submit {
+  flex: 0 0 auto;
+  min-height: 36px;
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  cursor: pointer;
+  padding: 0 14px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.calendar-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 .icon-button {
   width: 34px;
   height: 34px;
@@ -1480,6 +1676,32 @@ a {
   .create-card {
     border-radius: 20px;
     padding: 26px 19px;
+  }
+
+  .calendar-picker {
+    padding: 14px 12px;
+  }
+
+  .calendar-weekdays,
+  .calendar-days {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    column-gap: 4px;
+  }
+
+  .calendar-days button {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 9px;
+  }
+
+  .calendar-picker-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .calendar-submit {
+    width: 100%;
   }
 
   .two-fields {
