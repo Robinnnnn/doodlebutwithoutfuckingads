@@ -98,7 +98,7 @@ a {
   border-bottom: 1px solid var(--ink);
   font-size: 14px;
   font-weight: 700;
-  padding-bottom: 3px;
+  padding-bottom: 1px;
 }
 
 .create-page {
