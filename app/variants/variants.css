@@ -517,6 +517,36 @@
   margin-top: 28px;
 }
 
+.vl-skeleton {
+  min-height: 420px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  padding-top: 48px;
+}
+
+.vl-skeleton-line {
+  height: 52px;
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    #eceeeb 0%,
+    #f6f7f5 50%,
+    #eceeeb 100%
+  );
+  background-size: 200% 100%;
+}
+
+.vl-skeleton-line.short {
+  width: 42%;
+  height: 28px;
+}
+
+.vl-skeleton-line.tall {
+  height: 140px;
+  margin-top: 18px;
+}
+
 @media (max-width: 560px) {
   .vl-cal-settings {
     flex-direction: column;

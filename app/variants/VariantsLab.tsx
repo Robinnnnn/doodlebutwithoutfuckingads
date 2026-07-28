@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type CreateDraft = {
   title: string;
@@ -832,8 +832,16 @@ const VARIANTS = [
 
 export default function VariantsLab() {
   const [active, setActive] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const variant = VARIANTS[active];
   const ActiveVariant = variant.component;
+
+  useEffect(() => {
+    // The variants render locale-formatted dates and `new Date()` defaults,
+    // which can never match the server render — mount them client-side only.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   return (
     <main className="vl-page">
@@ -867,7 +875,16 @@ export default function VariantsLab() {
           real poll.
         </p>
 
-        <ActiveVariant key={variant.id} />
+        {mounted ? (
+          <ActiveVariant key={variant.id} />
+        ) : (
+          <div className="create-card vl-card vl-skeleton" aria-hidden="true">
+            <div className="vl-skeleton-line short" />
+            <div className="vl-skeleton-line" />
+            <div className="vl-skeleton-line" />
+            <div className="vl-skeleton-line tall" />
+          </div>
+        )}
       </div>
     </main>
   );
