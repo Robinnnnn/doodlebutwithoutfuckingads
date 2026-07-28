@@ -781,6 +781,13 @@ function PollView({ pollId }: { pollId: string }) {
               {poll.options.map((option) => {
                 const selected = response.selectedIds.includes(option.id);
                 const date = new Date(option.startsAt);
+                const end = new Date(
+                  date.getTime() + poll.durationMinutes * 60_000,
+                );
+                const timeLabel =
+                  poll.durationMinutes >= 1440
+                    ? "All day"
+                    : `${timeFormatter.format(date)} – ${timeFormatter.format(end)}`;
                 return (
                   <button
                     className={`option-card ${selected ? "selected" : ""}`}
@@ -797,7 +804,7 @@ function PollView({ pollId }: { pollId: string }) {
                         <span className="option-date">
                           {formatter.format(date)}
                         </span>
-                        <strong>{timeFormatter.format(date)}</strong>
+                        <strong>{timeLabel}</strong>
                       </div>
                     </div>
                     <div className="vote-tally">
