@@ -216,7 +216,6 @@ function CreatePoll() {
 
       <section className="create-hero">
         <div className="hero-copy">
-          <p className="eyebrow">Free, fast, and without fucking ads</p>
           <h1>
             Find a time.
             <br />
