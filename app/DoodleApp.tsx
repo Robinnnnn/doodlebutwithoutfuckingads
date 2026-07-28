@@ -50,7 +50,7 @@ type CreateDraft = {
 
 const brand = (
   <span className="brand" aria-label="doodlebutwithoutfuckingads">
-    <b>doodle</b><span>butwithout</span><strong>fucking</strong><b>ads</b><i>.</i>
+    <b>doodle</b><b>butwithout</b><strong>fucking</strong><span>ads</span><i>.</i>
   </span>
 );
 
@@ -240,11 +240,7 @@ function CreatePoll() {
 
         <form className="create-card" onSubmit={submit}>
           <div className="form-heading">
-            <span className="step-number">01</span>
-            <div>
-              <p className="micro-label">New poll</p>
-              <h2>What are we planning?</h2>
-            </div>
+            <h2>What are we planning?</h2>
           </div>
 
           <label>
