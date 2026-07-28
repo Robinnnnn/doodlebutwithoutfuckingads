@@ -538,6 +538,19 @@ a {
   transform: none;
 }
 
+.button-label {
+  display: inline-grid;
+  justify-items: start;
+}
+
+.button-label > * {
+  grid-area: 1 / 1;
+}
+
+.button-label > .is-hidden {
+  visibility: hidden;
+}
+
 .create-button {
   width: 100%;
   margin-top: 28px;

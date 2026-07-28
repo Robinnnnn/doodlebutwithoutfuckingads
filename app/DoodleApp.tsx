@@ -954,12 +954,16 @@ function PollView({ pollId }: { pollId: string }) {
                 className="primary-button"
                 disabled={saving || poll.options.length === 0}
               >
-                <span>
-                  {saving
-                    ? "Saving…"
-                    : response.submitted
-                      ? "Update response"
-                      : "Submit response"}
+                <span className="button-label">
+                  <span className={saving ? "is-hidden" : undefined}>
+                    {response.submitted ? "Update response" : "Submit response"}
+                  </span>
+                  <span
+                    className={saving ? undefined : "is-hidden"}
+                    aria-live="polite"
+                  >
+                    Saving…
+                  </span>
                 </span>
                 <span aria-hidden="true">→</span>
               </button>
