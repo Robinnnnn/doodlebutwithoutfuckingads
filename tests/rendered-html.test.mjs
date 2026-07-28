@@ -21,6 +21,9 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   assert.doesNotMatch(app, /New poll/);
   assert.match(app, /Create & get the link/);
   assert.doesNotMatch(app, /landing-footer/);
+  assert.match(app, /Event name <span className="required-marker">\*<\/span>/);
+  assert.match(app, /Your name <span className="required-marker">\*<\/span>/);
+  assert.doesNotMatch(app, /className="optional"/);
   assert.match(app, /No email gate\. No account\./);
   assert.match(
     layout,

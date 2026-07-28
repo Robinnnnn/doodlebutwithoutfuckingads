@@ -244,27 +244,33 @@ function CreatePoll() {
           </div>
 
           <label>
-            Event name
+            <span>
+              Event name <span className="required-marker">*</span>
+            </span>
             <input
               value={draft.title}
               onChange={(event) => update("title", event.target.value)}
               placeholder="August craft night"
               autoComplete="off"
+              required
             />
           </label>
 
           <div className="two-fields">
             <label>
-              Your name
+              <span>
+                Your name <span className="required-marker">*</span>
+              </span>
               <input
                 value={draft.organizer}
                 onChange={(event) => update("organizer", event.target.value)}
                 placeholder="Gianna"
                 autoComplete="name"
+                required
               />
             </label>
             <label>
-              Place <span className="optional">optional</span>
+              Place
               <input
                 value={draft.location}
                 onChange={(event) => update("location", event.target.value)}
@@ -275,7 +281,7 @@ function CreatePoll() {
           </div>
 
           <label>
-            A quick note <span className="optional">optional</span>
+            A quick note
             <input
               value={draft.note}
               onChange={(event) => update("note", event.target.value)}

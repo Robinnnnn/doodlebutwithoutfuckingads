@@ -305,11 +305,8 @@ a {
   gap: 16px;
 }
 
-.optional {
-  color: #9ba39f;
-  font-size: 9px;
-  font-weight: 650;
-  text-transform: none;
+.required-marker {
+  color: var(--coral);
 }
 
 .form-divider {
