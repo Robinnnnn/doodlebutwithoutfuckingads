@@ -1,4 +1,5 @@
 import { ensureSchema, getD1 } from "../../../db";
+import { createPollSlug } from "../../../lib/poll-slug";
 
 type CreatePollPayload = {
   title?: string;
@@ -14,8 +15,11 @@ function clean(value: unknown, max: number) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
-function shortId() {
-  return crypto.randomUUID().replaceAll("-", "").slice(0, 10);
+function isPollIdCollision(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.message.includes("UNIQUE constraint failed: polls.id")
+  );
 }
 
 export async function POST(request: Request) {
@@ -53,33 +57,46 @@ export async function POST(request: Request) {
     }
 
     const db = getD1();
-    const id = shortId();
-    await db.batch([
-      db
-        .prepare(
-          `INSERT INTO polls
-            (id, title, organizer, location, note, timezone, duration_minutes)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          id,
-          title,
-          organizer,
-          location,
-          note,
-          timezone,
-          durationMinutes,
-        ),
-      ...options.map((startsAt) =>
-        db
-          .prepare(
-            "INSERT INTO poll_options (id, poll_id, starts_at) VALUES (?, ?, ?)",
-          )
-          .bind(crypto.randomUUID(), id, startsAt),
-      ),
-    ]);
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      const id = createPollSlug();
 
-    return Response.json({ id }, { status: 201 });
+      try {
+        await db.batch([
+          db
+            .prepare(
+              `INSERT INTO polls
+                (id, title, organizer, location, note, timezone, duration_minutes)
+               VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            )
+            .bind(
+              id,
+              title,
+              organizer,
+              location,
+              note,
+              timezone,
+              durationMinutes,
+            ),
+          ...options.map((startsAt) =>
+            db
+              .prepare(
+                "INSERT INTO poll_options (id, poll_id, starts_at) VALUES (?, ?, ?)",
+              )
+              .bind(crypto.randomUUID(), id, startsAt),
+          ),
+        ]);
+
+        return Response.json({ id }, { status: 201 });
+      } catch (error) {
+        if (isPollIdCollision(error)) continue;
+        throw error;
+      }
+    }
+
+    return Response.json(
+      { error: "A unique poll link could not be made. Please try again." },
+      { status: 503 },
+    );
   } catch (error) {
     return Response.json(
       {

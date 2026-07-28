@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   FormEvent,
   useCallback,
@@ -48,10 +49,13 @@ type CreateDraft = {
 };
 
 const brand = (
-  <span className="brand" aria-label="Meetmint">
-    meet<span>mint</span><i>.</i>
+  <span className="brand" aria-label="doodlebutwithoutfuckingads">
+    <b>doodle</b><span>butwithout</span><strong>fuckingads</strong><i>.</i>
   </span>
 );
+
+const draftStorageKey = "doodlebutwithoutfuckingads:create-draft";
+const legacyDraftStorageKey = "meetmint:create-draft";
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -123,18 +127,27 @@ function CreatePoll() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("meetmint:create-draft");
+    const saved =
+      localStorage.getItem(draftStorageKey) ||
+      localStorage.getItem(legacyDraftStorageKey);
     if (!saved) return;
     try {
       const parsed = JSON.parse(saved) as CreateDraft;
-      if (parsed.options?.length) setDraft(parsed);
+      if (parsed.options?.length) {
+        // Restore the device-local draft after hydration.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setDraft(parsed);
+        localStorage.setItem(draftStorageKey, saved);
+        localStorage.removeItem(legacyDraftStorageKey);
+      }
     } catch {
-      localStorage.removeItem("meetmint:create-draft");
+      localStorage.removeItem(draftStorageKey);
+      localStorage.removeItem(legacyDraftStorageKey);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("meetmint:create-draft", JSON.stringify(draft));
+    localStorage.setItem(draftStorageKey, JSON.stringify(draft));
   }, [draft]);
 
   function update<K extends keyof CreateDraft>(
@@ -186,8 +199,9 @@ function CreatePoll() {
       if (!response.ok || !payload.id) {
         throw new Error(payload.error || "The poll could not be created.");
       }
-      localStorage.removeItem("meetmint:create-draft");
-      window.location.href = `/?poll=${payload.id}&created=1`;
+      localStorage.removeItem(draftStorageKey);
+      localStorage.removeItem(legacyDraftStorageKey);
+      window.location.href = `/p/${payload.id}?created=1`;
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -202,14 +216,14 @@ function CreatePoll() {
     <main className="create-page">
       <nav className="topbar create-nav">
         {brand}
-        <a href="/?poll=sample" className="text-link">
+        <Link href="/p/sample" className="text-link">
           View a sample
-        </a>
+        </Link>
       </nav>
 
       <section className="create-hero">
         <div className="hero-copy">
-          <p className="eyebrow">Free, fast, and delightfully uneventful</p>
+          <p className="eyebrow">Free, fast, and without fucking ads</p>
           <h1>
             Find a time.
             <br />
@@ -219,7 +233,10 @@ function CreatePoll() {
             A tiny group scheduler with no accounts, no ads, and nothing
             between your friends and a decision.
           </p>
-          <div className="promise-row" aria-label="Meetmint benefits">
+          <div
+            className="promise-row"
+            aria-label="doodlebutwithoutfuckingads benefits"
+          >
             <span>✦ No sign-up</span>
             <span>✦ No email required</span>
             <span>✦ No past times</span>
@@ -359,7 +376,7 @@ function CreatePoll() {
       </section>
 
       <footer className="landing-footer">
-        <span>Meetmint is the anti-calendar calendar.</span>
+        <span>Exactly what it says on the tin.</span>
         <span>Made for humans who just need a time.</span>
       </footer>
     </main>
@@ -376,7 +393,8 @@ function PollView({ pollId }: { pollId: string }) {
   const [editing, setEditing] = useState(true);
   const [notice, setNotice] = useState("");
 
-  const storageKey = `meetmint:response:${pollId}`;
+  const storageKey = `doodlebutwithoutfuckingads:response:${pollId}`;
+  const legacyStorageKey = `meetmint:response:${pollId}`;
 
   useEffect(() => {
     let stored: StoredResponse = {
@@ -385,16 +403,23 @@ function PollView({ pollId }: { pollId: string }) {
       selectedIds: [],
       submitted: false,
     };
-    const raw = localStorage.getItem(storageKey);
+    const raw =
+      localStorage.getItem(storageKey) ||
+      localStorage.getItem(legacyStorageKey);
     if (raw) {
       try {
         stored = { ...stored, ...(JSON.parse(raw) as StoredResponse) };
+        localStorage.setItem(storageKey, raw);
+        localStorage.removeItem(legacyStorageKey);
       } catch {
         localStorage.removeItem(storageKey);
+        localStorage.removeItem(legacyStorageKey);
       }
     }
+    // Restore this browser's anonymous voter token after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setResponse(stored);
-  }, [storageKey]);
+  }, [legacyStorageKey, storageKey]);
 
   const loadPoll = useCallback(
     async (token: string) => {
@@ -430,6 +455,8 @@ function PollView({ pollId }: { pollId: string }) {
 
   useEffect(() => {
     if (response?.token && status === "loading") {
+      // The poll request synchronizes this client view with shared D1 state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadPoll(response.token);
     }
   }, [loadPoll, response?.token, status]);
@@ -496,7 +523,7 @@ function PollView({ pollId }: { pollId: string }) {
 
   async function copyLink() {
     await navigator.clipboard.writeText(
-      `${window.location.origin}/?poll=${pollId}`,
+      `${window.location.origin}/p/${pollId}`,
     );
     setNotice("Poll link copied.");
   }
@@ -511,9 +538,9 @@ function PollView({ pollId }: { pollId: string }) {
           <p className="eyebrow">Nothing to vote on here</p>
           <h1>This poll took a wrong turn.</h1>
           <p>The link may be incomplete, or the poll is no longer available.</p>
-          <a className="primary-button" href="/">
+          <Link className="primary-button" href="/">
             Make a new poll <span>↗</span>
-          </a>
+          </Link>
         </section>
       </main>
     );
@@ -534,9 +561,9 @@ function PollView({ pollId }: { pollId: string }) {
   return (
     <main className="poll-page">
       <nav className="topbar poll-nav">
-        <a href="/" aria-label="Meetmint home">
+        <Link href="/" aria-label="doodlebutwithoutfuckingads home">
           {brand}
-        </a>
+        </Link>
         <div className="nav-actions">
           <span className="no-account-pill">No account needed</span>
           <button className="share-button" type="button" onClick={copyLink}>
@@ -724,7 +751,7 @@ function PollView({ pollId }: { pollId: string }) {
   );
 }
 
-export default function MeetmintApp({
+export default function DoodleApp({
   initialPollId,
 }: {
   initialPollId: string | null;

@@ -18,12 +18,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const host =
     requestHeaders.get("x-forwarded-host") ||
     requestHeaders.get("host") ||
-    "meetmint.app";
+    "doodlebutwithoutfuckingads.com";
   const protocol =
     requestHeaders.get("x-forwarded-proto") ||
     (host.startsWith("localhost") ? "http" : "https");
   const origin = new URL(`${protocol}://${host}`);
-  const title = "Meetmint — find a time, skip the circus";
+  const title =
+    "doodlebutwithoutfuckingads — find a time, skip the circus";
   const description =
     "A tiny group scheduler with no accounts, no ads, and no email gate.";
 
@@ -40,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: new URL("/og.png", origin),
           width: 1200,
           height: 630,
-          alt: "Meetmint — Find a time. Skip the circus.",
+          alt: "doodlebutwithoutfuckingads — Find a time. Skip the circus.",
         },
       ],
     },

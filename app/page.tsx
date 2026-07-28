@@ -1,4 +1,4 @@
-import MeetmintApp from "./MeetmintApp";
+import DoodleApp from "./DoodleApp";
 
 export default async function Home({
   searchParams,
@@ -13,5 +13,5 @@ export default async function Home({
         ? params.poll[0]?.slice(0, 100) || null
         : null;
 
-  return <MeetmintApp initialPollId={poll} />;
+  return <DoodleApp initialPollId={poll} />;
 }
