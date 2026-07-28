@@ -773,20 +773,7 @@ function PollView({ pollId }: { pollId: string }) {
 
         <section className="vote-section">
           <div className="section-heading">
-            <div>
-              <span className="step-number">01</span>
-              <div>
-                <p className="micro-label">Your availability</p>
-                <h2>What works for you?</h2>
-              </div>
-            </div>
-            <p>
-              {poll.responseCount === 0
-                ? "Be the first to vote"
-                : `${poll.responseCount} ${
-                    poll.responseCount === 1 ? "person has" : "people have"
-                  } voted`}
-            </p>
+            <h2>What works for you?</h2>
           </div>
 
           {poll.options.length ? (
@@ -845,15 +832,11 @@ function PollView({ pollId }: { pollId: string }) {
 
         <form className="response-bar" onSubmit={saveResponse}>
           <div className="response-label">
-            <span className="step-number">02</span>
-            <div>
-              <p className="micro-label">That’s it</p>
-              <h2>
-                {response.submitted && !editing
-                  ? "Your response is saved."
-                  : "Who’s voting?"}
-              </h2>
-            </div>
+            <h2>
+              {response.submitted && !editing
+                ? "Your response is saved."
+                : "Who’s voting?"}
+            </h2>
           </div>
 
           {response.submitted && !editing ? (
