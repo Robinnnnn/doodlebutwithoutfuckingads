@@ -9,6 +9,11 @@
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
+    "preview": "npm run build && wrangler dev --config dist/server/wrangler.json",
+    "deploy": "npm run build && npm run deploy:worker",
+    "deploy:worker": "npm run db:migrate:remote && vinext deploy --skip-build",
+    "db:migrate:remote": "wrangler d1 migrations apply meetmint-db --remote",
+    "cf-typegen": "wrangler types",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"

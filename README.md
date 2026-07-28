@@ -1,8 +1,8 @@
-# vinext-starter
+# Meetmint
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+A fast, ad-free group scheduler with no accounts or email gate. Meetmint runs
+on Cloudflare Workers, stores shared polls in D1, and remembers each browser's
+anonymous voter token locally so responses can be edited later.
 
 ## Prerequisites
 
