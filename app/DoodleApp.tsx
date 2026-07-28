@@ -50,7 +50,7 @@ type CreateDraft = {
 
 const brand = (
   <span className="brand" aria-label="doodlebutwithoutfuckingads">
-    <b>doodle</b><span>butwithout</span><strong>fuckingads</strong><i>.</i>
+    <b>doodle</b><span>butwithout</span><strong>fucking</strong><b>ads</b><i>.</i>
   </span>
 );
 
