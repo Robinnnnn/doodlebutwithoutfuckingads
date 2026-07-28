@@ -787,8 +787,8 @@ function PollView({ pollId }: { pollId: string }) {
             className="share-button"
             type="button"
             onClick={copyLink}
-            aria-label="Copy poll link"
           >
+            Copy poll link
             <IconCopy />
           </button>
         </div>
