@@ -1,5 +1,7 @@
+import { env } from "cloudflare:workers";
 import { ensureSchema, getD1 } from "../../../db";
 import { createPollSlug } from "../../../lib/poll-slug";
+import { enforceRateLimit } from "../../../lib/rate-limit";
 
 type CreatePollPayload = {
   title?: string;
@@ -24,6 +26,13 @@ function isPollIdCollision(error: unknown) {
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await enforceRateLimit({
+      binding: env.POLL_CREATE_RATE_LIMITER,
+      request,
+      scope: "poll-create",
+    });
+    if (rateLimited) return rateLimited;
+
     await ensureSchema();
     const body = (await request.json()) as CreatePollPayload;
     const title = clean(body.title, 100);

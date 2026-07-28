@@ -28,6 +28,32 @@
       "migrations_dir": "./drizzle"
     }
   ],
+  "ratelimits": [
+    {
+      "name": "POLL_CREATE_RATE_LIMITER",
+      "namespace_id": "2026072801",
+      "simple": {
+        "limit": 10,
+        "period": 60
+      }
+    },
+    {
+      "name": "POLL_READ_RATE_LIMITER",
+      "namespace_id": "2026072802",
+      "simple": {
+        "limit": 240,
+        "period": 60
+      }
+    },
+    {
+      "name": "POLL_RESPONSE_RATE_LIMITER",
+      "namespace_id": "2026072803",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ],
   "observability": {
     "enabled": true
   }

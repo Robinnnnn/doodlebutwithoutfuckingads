@@ -24,12 +24,12 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   assert.match(app, /Event name <span className="required-marker">\*<\/span>/);
   assert.match(app, /Your name <span className="required-marker">\*<\/span>/);
   assert.doesNotMatch(app, /className="optional"/);
-  assert.match(app, /No email gate\. No account\./);
+  assert.match(app, /No emails\. No\s+accounts\./);
   assert.match(
     layout,
     /doodlebutwithoutfuckingads — find a time, skip the circus/,
   );
-  assert.match(layout, /\/og\.png/);
+  assert.match(layout, /\/og-fallback-v2\.png/);
   assert.match(styles, /\.option-card\.selected/);
   assert.match(packageJson, /"name": "doodlebutwithoutfuckingads"/);
   assert.match(worker, /www\.doodlebutwithoutfuckingads\.com/);

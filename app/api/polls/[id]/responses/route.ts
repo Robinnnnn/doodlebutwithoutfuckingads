@@ -1,4 +1,6 @@
+import { env } from "cloudflare:workers";
 import { ensureSchema, getD1 } from "../../../../../db";
+import { enforceRateLimit } from "../../../../../lib/rate-limit";
 import { isLocalDevRequest } from "../../../../../lib/sample-poll";
 
 type ResponsePayload = {
@@ -12,8 +14,15 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    await ensureSchema();
     const { id: pollId } = await context.params;
+    const rateLimited = await enforceRateLimit({
+      binding: env.POLL_RESPONSE_RATE_LIMITER,
+      request,
+      scope: "poll-response",
+    });
+    if (rateLimited) return rateLimited;
+
+    await ensureSchema();
     const body = (await request.json()) as ResponsePayload;
     const token = body.token?.trim().slice(0, 100) || "";
     const name = body.name?.trim().slice(0, 60) || "";

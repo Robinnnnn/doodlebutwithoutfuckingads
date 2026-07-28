@@ -248,18 +248,66 @@ function secureRandomIndex(max: number) {
   return value[0] % max;
 }
 
-export function createPollSlug(
-  randomIndex: (max: number) => number = secureRandomIndex,
-) {
+const POLL_SLUG_SECRET_BYTES = 8;
+const BASE64_URL_ALPHABET =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+type PollSlugRandomness = {
+  randomIndex?: (max: number) => number;
+  randomBytes?: (length: number) => Uint8Array;
+};
+
+function secureRandomBytes(length: number) {
+  const value = new Uint8Array(length);
+  crypto.getRandomValues(value);
+  return value;
+}
+
+function encodeBase64Url(value: Uint8Array) {
+  let accumulator = 0;
+  let bitCount = 0;
+  let encoded = "";
+
+  for (const byte of value) {
+    accumulator = (accumulator << 8) | byte;
+    bitCount += 8;
+
+    while (bitCount >= 6) {
+      bitCount -= 6;
+      encoded += BASE64_URL_ALPHABET[(accumulator >> bitCount) & 0x3f];
+    }
+  }
+
+  if (bitCount > 0) {
+    encoded += BASE64_URL_ALPHABET[(accumulator << (6 - bitCount)) & 0x3f];
+  }
+
+  return encoded;
+}
+
+export function createPollSlug({
+  randomIndex = secureRandomIndex,
+  randomBytes = secureRandomBytes,
+}: PollSlugRandomness = {}) {
   const indexes = new Set<number>();
 
   while (indexes.size < 3) {
     indexes.add(randomIndex(POLL_SLUG_WORDS.length));
   }
 
-  return [...indexes].map((index) => POLL_SLUG_WORDS[index]).join("-");
+  const secret = randomBytes(POLL_SLUG_SECRET_BYTES);
+  if (secret.length !== POLL_SLUG_SECRET_BYTES) {
+    throw new Error(
+      `Poll slug randomness must provide ${POLL_SLUG_SECRET_BYTES} bytes.`,
+    );
+  }
+
+  return [
+    ...[...indexes].map((index) => POLL_SLUG_WORDS[index]),
+    encodeBase64Url(secret),
+  ].join("-");
 }
 
 export function isPollSlug(value: string) {
-  return /^[a-z]+(?:-[a-z]+){2}$/.test(value);
+  return /^[a-z]+-[a-z]+-[a-z]+(?:-[A-Za-z0-9_-]{11})?$/.test(value);
 }

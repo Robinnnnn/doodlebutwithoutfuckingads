@@ -1,4 +1,6 @@
+import { env } from "cloudflare:workers";
 import { ensureSchema, getD1 } from "../../../../db";
+import { enforceRateLimit } from "../../../../lib/rate-limit";
 import {
   isLocalDevRequest,
   samplePollDefaults,
@@ -60,8 +62,15 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    await ensureSchema();
     const { id } = await context.params;
+    const rateLimited = await enforceRateLimit({
+      binding: env.POLL_READ_RATE_LIMITER,
+      request,
+      scope: "poll-read",
+    });
+    if (rateLimited) return rateLimited;
+
+    await ensureSchema();
     const localDev = isLocalDevRequest(request);
     // Rebuild sample so copy/times always match the create form defaults.
     if (id === "sample") await ensureSamplePoll();
