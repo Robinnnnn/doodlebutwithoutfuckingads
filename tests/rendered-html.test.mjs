@@ -14,7 +14,6 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
 
   assert.match(app, /Find a time\./);
   assert.match(app, /Skip the circus\./);
-  assert.match(app, /No sign-up/);
   assert.match(app, /Create & get the link/);
   assert.match(app, /No email gate\. No account\./);
   assert.match(

@@ -226,14 +226,16 @@ function CreatePoll() {
             a truly tiny group scheduler with no accounts, no ads, and no
             bullshit 😇
           </p>
-          <div
-            className="promise-row"
-            aria-label="doodlebutwithoutfuckingads benefits"
-          >
-            <span>✦ No sign-up</span>
-            <span>✦ No email gate</span>
-            <span>✦ No past times</span>
-          </div>
+          {/*
+            <div
+              className="promise-row"
+              aria-label="doodlebutwithoutfuckingads benefits"
+            >
+              <span>✦ No sign-up</span>
+              <span>✦ No email gate</span>
+              <span>✦ No past times</span>
+            </div>
+          */}
         </div>
 
         <form className="create-card" onSubmit={submit}>
