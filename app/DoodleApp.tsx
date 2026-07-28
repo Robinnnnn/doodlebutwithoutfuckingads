@@ -75,6 +75,15 @@ function initialTimes() {
   return [toLocalInput(first), toLocalInput(second)];
 }
 
+function nextMonthCraftNight() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const month = new Intl.DateTimeFormat(undefined, { month: "long" }).format(
+    next,
+  );
+  return `${month} craft night`;
+}
+
 function makeToken() {
   return crypto.randomUUID();
 }
@@ -249,7 +258,7 @@ function CreatePoll() {
             <input
               value={draft.title}
               onChange={(event) => update("title", event.target.value)}
-              placeholder="August craft night"
+              placeholder={nextMonthCraftNight()}
               autoComplete="off"
               required
             />
