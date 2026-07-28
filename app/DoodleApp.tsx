@@ -567,6 +567,7 @@ function PollView({ pollId }: { pollId: string }) {
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(true);
   const [notice, setNotice] = useState("");
+  const [noneChosen, setNoneChosen] = useState(false);
 
   const storageKey = `doodlebutwithoutfuckingads:response:${pollId}`;
 
@@ -619,6 +620,9 @@ function PollView({ pollId }: { pollId: string }) {
             submitted: true,
           };
         });
+        setNoneChosen(
+          Boolean(data.myResponse && data.myResponse.optionIds.length === 0),
+       );
         setEditing(!data.myResponse);
         setStatus("ready");
       } catch {
@@ -642,6 +646,7 @@ function PollView({ pollId }: { pollId: string }) {
 
   function toggleOption(optionId: string) {
     if (!editing) setEditing(true);
+    setNoneChosen(false);
     setResponse((current) => {
       if (!current) return current;
       return {
@@ -651,6 +656,15 @@ function PollView({ pollId }: { pollId: string }) {
           : [...current.selectedIds, optionId],
       };
     });
+    setNotice("");
+  }
+
+  function pickNone() {
+    if (!editing) setEditing(true);
+    setNoneChosen(true);
+    setResponse((current) =>
+      current ? { ...current, selectedIds: [] } : current,
+    );
     setNotice("");
   }
 
@@ -833,6 +847,25 @@ function PollView({ pollId }: { pollId: string }) {
                   </button>
                 );
               })}
+              <button
+                className={`option-card none-card ${noneChosen ? "selected" : ""}`}
+                type="button"
+                aria-pressed={noneChosen}
+                onClick={pickNone}
+              >
+                <div className="option-choice">
+                  <span className="fake-checkbox" aria-hidden="true">
+                    {noneChosen ? "✓" : ""}
+                  </span>
+                  <div>
+                    <span className="option-date">No fit</span>
+                    <strong>None of the above</strong>
+                  </div>
+                </div>
+                <div className="vote-tally">
+                  <span>Can’t make any of these</span>
+                </div>
+              </button>
             </div>
           ) : (
             <div className="empty-options">
