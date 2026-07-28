@@ -867,7 +867,7 @@ function PollView({ pollId }: { pollId: string }) {
                         : current,
                     )
                   }
-                  placeholder="e.g. Robin"
+                  placeholder="Obama"
                   autoComplete="name"
                 />
               </label>
