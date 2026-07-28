@@ -549,8 +549,7 @@ a {
 .poll-page {
   min-height: 100vh;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)),
-    radial-gradient(circle at 94% 4%, rgba(168, 230, 202, 0.55), transparent 24%),
+    radial-gradient(circle at 94% 4%, rgba(168, 230, 202, 0.4), transparent 24%),
     var(--cream);
 }
 
@@ -867,7 +866,7 @@ a {
   align-items: center;
   border-top: 1px solid #dfe3de;
   border-radius: 0 0 30px 30px;
-  background: #fff;
+  background: var(--paper);
   padding: 36px 72px;
 }
 
