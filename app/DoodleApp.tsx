@@ -376,7 +376,7 @@ function CreatePoll() {
     <main className="create-page">
       <nav className="topbar create-nav">
         {brand}
-        <Link href="/sample" className="text-link">
+        <Link href="/sample" className="text-link desktop-sample-link">
           View a sample
         </Link>
       </nav>
@@ -390,7 +390,10 @@ function CreatePoll() {
           </h1>
           <p className="hero-subtitle">
             a truly tiny group scheduler with no accounts, no ads, and no
-            bullshit 😇
+            bullshit 😇{" "}
+            <Link href="/sample" className="mobile-sample-link">
+              View a sample
+            </Link>
           </p>
         </div>
 
@@ -805,7 +808,7 @@ function PollView({ pollId }: { pollId: string }) {
             type="button"
             onClick={copyLink}
           >
-            Share poll
+            Copy poll link
             <IconCopy />
           </button>
         </div>

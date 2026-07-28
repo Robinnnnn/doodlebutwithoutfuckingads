@@ -20,6 +20,9 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   );
   assert.doesNotMatch(app, /New poll/);
   assert.match(app, /Create Poll/);
+  assert.match(app, /className="text-link desktop-sample-link"/);
+  assert.match(app, /bullshit 😇\{" "\}[\s\S]*className="mobile-sample-link"/);
+  assert.match(app, /Copy poll link\s*<IconCopy \/>/);
   assert.doesNotMatch(app, /landing-footer/);
   assert.match(app, /Event name <span className="required-marker">\*<\/span>/);
   assert.match(app, /Your name <span className="required-marker">\*<\/span>/);
@@ -31,6 +34,9 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
   );
   assert.match(layout, /\/og\.png/);
   assert.match(styles, /\.option-card\.selected/);
+  assert.match(styles, /\.desktop-sample-link\s*\{\s*display: none;/);
+  assert.match(styles, /\.mobile-sample-link\s*\{\s*display: inline;/);
+  assert.match(styles, /\.poll-nav\s*\{\s*height: auto;[\s\S]*flex-direction: column;/);
   assert.match(packageJson, /"name": "doodlebutwithoutfuckingads"/);
   assert.match(worker, /www\.doodlebutwithoutfuckingads\.com/);
   assert.match(worker, /Response\.redirect\(url, 308\)/);

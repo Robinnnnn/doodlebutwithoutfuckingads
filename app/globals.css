@@ -107,6 +107,10 @@ a {
   padding-bottom: 1px;
 }
 
+.mobile-sample-link {
+  display: none;
+}
+
 .create-page {
   min-height: 100vh;
   background:
@@ -1158,6 +1162,10 @@ a {
     height: 72px;
   }
 
+  .create-nav {
+    justify-content: flex-start;
+  }
+
   .brand {
     font-size: 17px;
     letter-spacing: -0.9px;
@@ -1167,12 +1175,42 @@ a {
     font-size: 24px;
   }
 
+  .desktop-sample-link {
+    display: none;
+  }
+
+  .mobile-sample-link {
+    display: inline;
+    margin-left: 6px;
+    color: var(--ink);
+    font-size: 0.9em;
+    font-weight: 750;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+  }
+
   .no-account-pill {
     display: none;
   }
 
   .share-button {
     padding: 0 13px;
+  }
+
+  .poll-nav {
+    height: auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    padding: 22px 0 20px;
+  }
+
+  .poll-nav > a,
+  .poll-nav .nav-actions {
+    justify-content: center;
+    width: 100%;
   }
 
   .create-hero {
