@@ -867,6 +867,7 @@ a {
   gap: 40px;
   align-items: center;
   border-top: 1px solid #dfe3de;
+  border-radius: 0 0 30px 30px;
   background: #fff;
   padding: 36px 72px;
 }
