@@ -583,7 +583,7 @@ a {
     transform 140ms ease;
 }
 
-.calendar-days button:not(:disabled):hover {
+.calendar-days button:not(:disabled):not(.selected):hover {
   border-color: #9ab4a7;
   background: var(--mint-soft);
   transform: translateY(-1px);
@@ -594,10 +594,6 @@ a {
 .calendar-submit:focus-visible {
   outline: 3px solid rgba(168, 230, 202, 0.58);
   outline-offset: 2px;
-}
-
-.calendar-days button.outside-month {
-  color: #9da6a1;
 }
 
 .calendar-days button:disabled {
@@ -626,6 +622,13 @@ a {
   border-color: var(--green);
   background: var(--green);
   color: #fff;
+}
+
+.calendar-days button.selected:not(:disabled):hover {
+  border-color: #0c3f2e;
+  background: #0c3f2e;
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .calendar-key {

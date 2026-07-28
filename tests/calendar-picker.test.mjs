@@ -50,5 +50,10 @@ test("ships future-only multi-date selection with existing dates marked", async 
   assert.match(app, /New dates start at 6:00 PM\./);
   assert.match(styles, /\.calendar-days button\.existing/);
   assert.match(styles, /\.calendar-days button\.selected/);
+  assert.match(
+    styles,
+    /\.calendar-days button:not\(:disabled\):not\(\.selected\):hover/,
+  );
+  assert.doesNotMatch(styles, /button\.outside-month\s*\{\s*color:/);
   assert.match(styles, /\.calendar-picker-footer/);
 });
