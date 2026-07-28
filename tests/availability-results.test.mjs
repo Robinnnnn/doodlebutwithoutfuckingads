@@ -55,6 +55,11 @@ test("offers compact list and grid results only after submission, including samp
   assert.match(styles, /\.availability-grid-wrap/);
   assert.match(styles, /position: sticky/);
   assert.match(styles, /\.grid-status\.if-needed/);
+  assert.match(styles, /background: #ffe5dc/);
+  assert.match(
+    styles,
+    /\.availability-grid thead th:first-child,[\s\S]*max-width: 108px;/,
+  );
   assert.match(pollRoute, /samplePollParticipants/);
   assert.match(sample, /status: "if-needed" as const/);
 });

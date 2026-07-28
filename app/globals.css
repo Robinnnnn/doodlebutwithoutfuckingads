@@ -856,9 +856,9 @@ a {
 }
 
 .option-card.if-needed {
-  border-color: #d5aa3b;
-  background: #fff8dc;
-  box-shadow: inset 0 0 0 1px #d5aa3b;
+  border-color: rgba(228, 105, 75, 0.62);
+  background: #fff3ee;
+  box-shadow: inset 0 0 0 1px rgba(228, 105, 75, 0.24);
 }
 
 .option-choice {
@@ -886,9 +886,9 @@ a {
 }
 
 .if-needed .fake-checkbox {
-  border-color: #b88709;
-  background: #e9ba3f;
-  color: #4d3700;
+  border-color: #d5684d;
+  background: #ffb29c;
+  color: #6d2d1e;
 }
 
 .option-date {
@@ -918,7 +918,7 @@ a {
 }
 
 .if-needed .availability-choice-label {
-  color: #8a6507;
+  color: #a34b36;
 }
 
 .vote-tally {
@@ -960,10 +960,10 @@ a {
 }
 
 .availability-grid {
-  width: 100%;
-  min-width: 620px;
+  width: max-content;
+  min-width: 100%;
   border-spacing: 0;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .availability-grid th,
@@ -982,6 +982,7 @@ a {
 
 .availability-grid thead th {
   width: 132px;
+  min-width: 132px;
   background: #f8f6ef;
   padding: 13px 9px;
   text-align: center;
@@ -994,6 +995,8 @@ a {
   left: 0;
   z-index: 2;
   width: 176px;
+  min-width: 176px;
+  max-width: 176px;
   box-shadow: 5px 0 10px -10px rgba(27, 42, 36, 0.55);
   text-align: left;
 }
@@ -1091,8 +1094,8 @@ a {
 
 .grid-status.if-needed,
 .availability-legend i.if-needed {
-  background: #fff3c6;
-  color: #8a6507;
+  background: #ffe5dc;
+  color: #a34b36;
 }
 
 .grid-status.unavailable,
@@ -1102,7 +1105,10 @@ a {
 }
 
 .availability-legend {
-  min-width: 620px;
+  position: sticky;
+  left: 0;
+  width: max-content;
+  min-width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1559,20 +1565,40 @@ a {
   }
 
   .availability-grid {
-    min-width: 540px;
+    min-width: 100%;
   }
 
   .availability-grid thead th {
-    width: 116px;
+    width: 112px;
+    min-width: 112px;
   }
 
   .availability-grid thead th:first-child,
   .availability-grid tbody th {
-    width: 142px;
+    width: 108px;
+    min-width: 108px;
+    max-width: 108px;
+  }
+
+  .availability-grid thead th:first-child {
+    padding-left: 10px;
+  }
+
+  .availability-grid tbody th {
+    padding: 8px;
+  }
+
+  .grid-participant {
+    gap: 7px;
+  }
+
+  .grid-avatar {
+    width: 24px;
+    height: 24px;
   }
 
   .availability-legend {
-    min-width: 540px;
+    min-width: 100%;
     justify-content: flex-start;
   }
 
