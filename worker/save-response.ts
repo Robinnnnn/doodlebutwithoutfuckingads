@@ -1,6 +1,3 @@
-import { ensureSchema, getD1 } from "../../../../../db";
-import { isLocalDevRequest } from "../../../../../lib/sample-poll";
-
 type ResponsePayload = {
   token?: string;
   name?: string;
@@ -13,13 +10,12 @@ type ResponsePayload = {
 
 type AvailabilityStatus = "yes" | "if-needed";
 
-export async function POST(
+export async function handleSaveResponse(
   request: Request,
-  context: { params: Promise<{ id: string }> },
+  db: D1Database,
+  pollId: string,
 ) {
   try {
-    const { id: pollId } = await context.params;
-    await ensureSchema();
     const body = (await request.json()) as ResponsePayload;
     const token = body.token?.trim().slice(0, 100) || "";
     const name = body.name?.trim().slice(0, 60) || "";
@@ -58,11 +54,10 @@ export async function POST(
     }
 
     // Sample votes must not pile up for every visitor in production.
-    if (pollId === "sample" && !isLocalDevRequest(request)) {
+    if (pollId === "sample") {
       return Response.json({ ok: true, ephemeral: true });
     }
 
-    const db = getD1();
     const poll = await db
       .prepare("SELECT id FROM polls WHERE id = ?")
       .bind(pollId)

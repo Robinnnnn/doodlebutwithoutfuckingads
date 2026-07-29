@@ -1,80 +1,9 @@
-import "server-only";
-
-import { ensureSchema, getD1 } from "../db";
-import { samplePollDefaults } from "./sample-poll";
-
-type PollShareRow = {
-  title: string;
-  organizer: string;
-  timezone: string;
-};
-
-type PollOptionShareRow = {
-  starts_at: string;
-};
-
 export type PollShareData = {
   title: string;
   organizer: string;
   timezone: string;
   optionStarts: string[];
 };
-
-const MAX_POLL_ID_LENGTH = 100;
-
-function cleanShareText(value: string, maxLength: number) {
-  return value.trim().replace(/\s+/g, " ").slice(0, maxLength);
-}
-
-export async function getPollShareData(
-  rawId: string,
-): Promise<PollShareData | null> {
-  const id = rawId.slice(0, MAX_POLL_ID_LENGTH);
-  if (!id || id !== rawId) return null;
-
-  if (id === "sample") {
-    const sample = samplePollDefaults();
-    return {
-      title: sample.title,
-      organizer: sample.organizer,
-      timezone: sample.timezone,
-      optionStarts: sample.options,
-    };
-  }
-
-  try {
-    await ensureSchema();
-    const db = getD1();
-    const poll = await db
-      .prepare(
-        "SELECT title, organizer, timezone FROM polls WHERE id = ?",
-      )
-      .bind(id)
-      .first<PollShareRow>();
-
-    if (!poll) return null;
-
-    const options = await db
-      .prepare(
-        `SELECT starts_at
-         FROM poll_options
-         WHERE poll_id = ? AND starts_at > ?
-         ORDER BY starts_at ASC
-         LIMIT 30`,
-      )
-      .bind(id, new Date().toISOString())
-      .all<PollOptionShareRow>();
-
-    return {
-      title: cleanShareText(poll.title, 100),
-      organizer: cleanShareText(poll.organizer, 60),
-      timezone: cleanShareText(poll.timezone, 80) || "UTC",
-      optionStarts: options.results.map((option) => option.starts_at),
-    };
-  } catch {
-    return null;
-  }
-}
 
 function dateFormatter(
   timezone: string,

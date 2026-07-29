@@ -1,4 +1,18 @@
-@import "tailwindcss";
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/fonts/dm-sans-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/fraunces-latin.woff2") format("woff2");
+}
 
 :root {
   --ink: #1b2a24;
@@ -28,12 +42,22 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  margin-block: 0;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 button,
 input,
 select {
   font: inherit;
+  margin: 0;
 }
 
 button,
@@ -43,6 +67,12 @@ a {
 
 button {
   color: inherit;
+}
+
+button,
+input,
+select {
+  border-style: solid;
 }
 
 a {

@@ -2,9 +2,17 @@
 
 A fast, ad-free group scheduler with no accounts and no email gate.
 
+The browser UI is plain HTML, CSS, and JavaScript. A small Cloudflare Worker
+serves the app shell, adds poll-specific sharing metadata, and handles the JSON
+API. There is no client framework or hydration step.
+
 Polls and votes live in Cloudflare D1. Temporary drafts and anonymous voter
 tokens stay in the browser so people can return and edit their response without
 creating an account.
+
+The built-in sample is generated directly in the Worker response. It never
+reads from or writes to D1, and it does not wait for a follow-up API request
+before rendering.
 
 New polls keep a memorable three-word prefix and add a cryptographically random
 64-bit suffix so public links cannot be guessed through practical enumeration:
@@ -27,9 +35,13 @@ Requires Node.js `>=22.13.0`.
 
 ```bash
 npm install
+npm run db:migrate:local
 npm run dev
 npm test
 ```
+
+The local migration command is only needed when setting up a fresh local
+database.
 
 ## Deployment
 

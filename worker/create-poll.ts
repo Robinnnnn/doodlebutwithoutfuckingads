@@ -1,5 +1,4 @@
-import { ensureSchema, getD1 } from "../../../db";
-import { createPollSlug } from "../../../lib/poll-slug";
+import { createPollSlug } from "../lib/poll-slug";
 
 type CreatePollPayload = {
   title?: string;
@@ -22,9 +21,8 @@ function isPollIdCollision(error: unknown) {
   );
 }
 
-export async function POST(request: Request) {
+export async function handleCreatePoll(request: Request, db: D1Database) {
   try {
-    await ensureSchema();
     const body = (await request.json()) as CreatePollPayload;
     const title = clean(body.title, 100);
     const organizer = clean(body.organizer, 60);
@@ -56,7 +54,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = getD1();
     for (let attempt = 0; attempt < 12; attempt += 1) {
       const id = createPollSlug();
 

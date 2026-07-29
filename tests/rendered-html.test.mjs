@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
-test("ships doodlebutwithoutfuckingads instead of the starter preview", async () => {
-  const [app, layout, styles, packageJson, worker, wrangler] = await Promise.all([
-    readFile(new URL("../app/DoodleApp.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+test("ships the scheduler as HTML, CSS, and vanilla JavaScript", async () => {
+  const [app, html, styles, packageJson, worker, wrangler] = await Promise.all([
+    readFile(new URL("../src/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../index.html", import.meta.url), "utf8"),
+    readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../worker/index.ts", import.meta.url), "utf8"),
     readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
@@ -18,43 +18,52 @@ test("ships doodlebutwithoutfuckingads instead of the starter preview", async ()
     app,
     /<b>doodle<\/b><b>butwithout<\/b><strong>fucking<\/strong><span>ads<\/span><i>\.<\/i><em>com<\/em>/,
   );
-  assert.doesNotMatch(app, /New poll/);
   assert.match(app, /Create Poll/);
-  assert.match(app, /function IconArrowUpRight/);
-  assert.match(app, /<IconArrowUpRight \/>/);
+  assert.match(app, /iconArrowUpRight/);
   assert.doesNotMatch(app, /[↗→←]/);
-  assert.match(app, /className="text-link desktop-sample-link"/);
-  assert.match(app, /bullshit 😇\{" "\}[\s\S]*className="mobile-sample-link"/);
-  assert.match(app, /Copy poll link\s*<IconCopy \/>/);
-  assert.doesNotMatch(app, /landing-footer/);
-  assert.match(app, /Event name <span className="required-marker">\*<\/span>/);
-  assert.match(app, /Your name <span className="required-marker">\*<\/span>/);
-  assert.doesNotMatch(app, /className="optional"/);
-  assert.match(app, /No emails\. No\s+accounts\./);
-  assert.match(
-    layout,
-    /doodlebutwithoutfuckingads — find a time, skip the circus/,
-  );
-  assert.match(layout, /\/og\.png/);
+  assert.match(app, /class="text-link desktop-sample-link"/);
+  assert.match(app, /bullshit 😇[\s\S]*class="mobile-sample-link"/);
+  assert.match(app, /Copy poll link \$\{iconCopy\}/);
+  assert.match(app, /Event name <span class="required-marker">\*<\/span>/);
+  assert.match(app, /Your name <span class="required-marker">\*<\/span>/);
+  assert.match(app, /No emails\. No accounts\./);
+  assert.match(html, /<!--APP_META-->/);
+  assert.match(html, /<!--APP_BOOTSTRAP-->/);
+  assert.match(html, /type="module" src="\/src\/app\.js"/);
   assert.match(styles, /\.option-card\.selected/);
   assert.match(styles, /\.desktop-sample-link\s*\{\s*display: none;/);
   assert.match(styles, /\.mobile-sample-link\s*\{\s*display: inline;/);
   assert.match(styles, /\.create-nav\s*\{\s*justify-content: center;/);
   assert.match(styles, /\.poll-nav\s*\{\s*height: auto;[\s\S]*flex-direction: column;/);
   assert.match(packageJson, /"name": "doodlebutwithoutfuckingads"/);
+  assert.doesNotMatch(packageJson, /"next"|"react"|"react-dom"|"vinext"/);
   assert.match(worker, /www\.doodlebutwithoutfuckingads\.com/);
   assert.match(worker, /Response\.redirect\(url, 308\)/);
   assert.match(worker, /rateLimitApiRequest/);
-  assert.match(worker, /pathname === "\/api\/polls"/);
   assert.match(worker, /POLL_CREATE_RATE_LIMITER/);
   assert.match(worker, /POLL_READ_RATE_LIMITER/);
   assert.match(worker, /POLL_RESPONSE_RATE_LIMITER/);
-  assert.match(wrangler, /"pattern": "doodlebutwithoutfuckingads\.com"/);
-  assert.match(wrangler, /"pattern": "www\.doodlebutwithoutfuckingads\.com"/);
+  assert.match(worker, /servePollPage/);
+  assert.match(wrangler, /"run_worker_first": true/);
 
-  const combined = `${app}\n${layout}\n${styles}\n${packageJson}\n${worker}\n${wrangler}`;
+  const combined = `${app}\n${html}\n${styles}\n${packageJson}\n${worker}`;
   assert.doesNotMatch(
     combined,
     /codex-preview|react-loading-skeleton|Your site is taking shape/i,
   );
+});
+
+test("keeps the production frontend intentionally tiny", async () => {
+  const assetDirectory = new URL("../dist/client/assets/", import.meta.url);
+  const files = await readdir(assetDirectory);
+  const scripts = files.filter((file) => file.endsWith(".js"));
+  const styles = files.filter((file) => file.endsWith(".css"));
+
+  assert.equal(scripts.length, 1);
+  assert.equal(styles.length, 1);
+
+  const scriptBytes = (await stat(new URL(scripts[0], assetDirectory))).size;
+  const styleBytes = (await stat(new URL(styles[0], assetDirectory))).size;
+  assert.ok(scriptBytes < 40_000, `frontend script is ${scriptBytes} bytes`);
+  assert.ok(styleBytes < 35_000, `stylesheet is ${styleBytes} bytes`);
 });

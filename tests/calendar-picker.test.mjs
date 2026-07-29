@@ -7,7 +7,7 @@ import {
   monthKeyForDate,
   optionAtDefaultTime,
   shiftMonth,
-} from "../lib/calendar.ts";
+} from "../src/calendar.js";
 
 test("builds stable calendar months and default-time options", () => {
   const july = new Date(2026, 6, 14, 12);
@@ -30,21 +30,19 @@ test("renders a complete six-week calendar grid", () => {
   assert.equal(days[0].date.getDay(), 0);
   assert.equal(days.at(-1).date.getDay(), 6);
   assert.ok(
-    days.some(
-      (day) => day.key === "2026-07-01" && day.inCurrentMonth,
-    ),
+    days.some((day) => day.key === "2026-07-01" && day.inCurrentMonth),
   );
 });
 
 test("ships future-only multi-date selection with existing dates marked", async () => {
   const [app, styles] = await Promise.all([
-    readFile(new URL("../app/DoodleApp.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    readFile(new URL("../src/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
   ]);
 
-  assert.match(app, /className="calendar-picker"/);
-  assert.match(app, /disabled=\{unavailable \|\| existing\}/);
-  assert.match(app, /className="calendar-key-existing"/);
+  assert.match(app, /class="calendar-picker"/);
+  assert.match(app, /unavailable \|\| existing \? "disabled"/);
+  assert.match(app, /class="calendar-key-existing"/);
   assert.match(app, /calendarSelection\.length/);
   assert.match(app, /optionAtDefaultTime/);
   assert.match(app, /New dates start at 6:00 PM\./);

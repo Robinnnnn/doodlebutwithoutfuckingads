@@ -3,53 +3,47 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("persists three-state availability without breaking legacy yes votes", async () => {
-  const [app, responseRoute, pollRoute, schema, migration] = await Promise.all([
-    readFile(new URL("../app/DoodleApp.tsx", import.meta.url), "utf8"),
-    readFile(
-      new URL("../app/api/polls/[id]/responses/route.ts", import.meta.url),
-      "utf8",
-    ),
-    readFile(
-      new URL("../app/api/polls/[id]/route.ts", import.meta.url),
-      "utf8",
-    ),
-    readFile(new URL("../db/schema.ts", import.meta.url), "utf8"),
-    readFile(
-      new URL("../drizzle/0002_wonderful_hellfire_club.sql", import.meta.url),
-      "utf8",
-    ),
-  ]);
+  const [app, responseHandler, pollHandler, schema, migration] =
+    await Promise.all([
+      readFile(new URL("../src/app.js", import.meta.url), "utf8"),
+      readFile(new URL("../worker/save-response.ts", import.meta.url), "utf8"),
+      readFile(new URL("../worker/read-poll.ts", import.meta.url), "utf8"),
+      readFile(new URL("../db/schema.ts", import.meta.url), "utf8"),
+      readFile(
+        new URL("../drizzle/0002_wonderful_hellfire_club.sql", import.meta.url),
+        "utf8",
+      ),
+    ]);
 
-  assert.match(app, /type AvailabilityStatus = "yes" \| "if-needed"/);
-  assert.match(app, /currentStatus === "yes"/);
-  assert.match(app, /availability\[optionId\] = "if-needed"/);
-  assert.match(app, /delete availability\[optionId\]/);
-  assert.match(responseRoute, /body\.optionIds/);
-  assert.match(responseRoute, /status: "yes"/);
+  assert.match(app, /current === "yes"/);
   assert.match(
-    responseRoute,
+    app,
+    /pollState\.response\.availability\[optionId\] = "if-needed"/,
+  );
+  assert.match(app, /delete pollState\.response\.availability\[optionId\]/);
+  assert.match(responseHandler, /body\.optionIds/);
+  assert.match(responseHandler, /status: "yes"/);
+  assert.match(
+    responseHandler,
     /INSERT INTO votes \(response_id, option_id, status\)/,
   );
-  assert.match(pollRoute, /v\.status/);
+  assert.match(pollHandler, /v\.status/);
   assert.match(schema, /status: text\("status"\)\.notNull\(\)\.default\("yes"\)/);
   assert.match(migration, /ADD `status` text DEFAULT 'yes' NOT NULL/);
 });
 
-test("offers compact list and grid results only after submission, including sample data", async () => {
-  const [app, styles, pollRoute, sample] = await Promise.all([
-    readFile(new URL("../app/DoodleApp.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
-    readFile(
-      new URL("../app/api/polls/[id]/route.ts", import.meta.url),
-      "utf8",
-    ),
+test("offers compact list and grid results only after submission", async () => {
+  const [app, styles, pollHandler, sample] = await Promise.all([
+    readFile(new URL("../src/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../src/styles.css", import.meta.url), "utf8"),
+    readFile(new URL("../worker/read-poll.ts", import.meta.url), "utf8"),
     readFile(new URL("../lib/sample-poll.ts", import.meta.url), "utf8"),
   ]);
 
-  assert.match(app, /showingResults = response\.submitted && !editing/);
-  assert.match(app, /className="results-view-toggle"/);
-  assert.match(app, /resultsView === "grid"/);
-  assert.match(app, /className="availability-grid"/);
+  assert.match(app, /response\.submitted && !pollState\.editing/);
+  assert.match(app, /class="results-view-toggle"/);
+  assert.match(app, /pollState\.resultsView === "grid"/);
+  assert.match(app, /class="availability-grid"/);
   assert.match(app, /Everyone’s availability/);
   assert.match(app, /yes · \$\{ifNeededVoters\.length\} if needed/);
   assert.match(styles, /\.availability-grid-wrap/);
@@ -60,6 +54,8 @@ test("offers compact list and grid results only after submission, including samp
     styles,
     /\.availability-grid thead th:first-child,[\s\S]*max-width: 108px;/,
   );
-  assert.match(pollRoute, /samplePollParticipants/);
+  assert.match(pollHandler, /samplePollParticipants/);
+  assert.doesNotMatch(pollHandler, /DELETE FROM/);
+  assert.doesNotMatch(pollHandler, /INSERT INTO polls/);
   assert.match(sample, /status: "if-needed" as const/);
 });
