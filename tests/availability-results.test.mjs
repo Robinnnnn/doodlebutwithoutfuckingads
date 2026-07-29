@@ -43,6 +43,11 @@ test("offers compact list and grid results only after submission", async () => {
   assert.match(app, /response\.submitted && !pollState\.editing/);
   assert.match(app, /class="results-view-toggle"/);
   assert.match(app, /pollState\.resultsView === "grid"/);
+  assert.match(app, /resultsView: "grid"/);
+  assert.ok(
+    app.indexOf('data-poll-action="results-grid"') <
+      app.indexOf('data-poll-action="results-list"'),
+  );
   assert.match(app, /class="availability-grid"/);
   assert.match(app, /Everyone’s availability/);
   assert.match(app, /yes · \$\{ifNeededVoters\.length\} if needed/);
@@ -50,6 +55,9 @@ test("offers compact list and grid results only after submission", async () => {
   assert.match(styles, /position: sticky/);
   assert.match(styles, /\.grid-status\.if-needed/);
   assert.match(styles, /background: #ffe5dc/);
+  assert.match(styles, /\.results-view-toggle::before/);
+  assert.match(styles, /transition: transform 180ms/);
+  assert.doesNotMatch(styles, /5px 0 10px -10px/);
   assert.match(
     styles,
     /\.availability-grid thead th:first-child,[\s\S]*max-width: 108px;/,

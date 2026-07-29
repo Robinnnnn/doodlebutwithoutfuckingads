@@ -1022,19 +1022,24 @@ function voteSectionTemplate(view, formatter, pollTimeFormatter) {
         </div>
         ${
           view.showingResults
-            ? `<div class="results-view-toggle" role="group" aria-label="Results view">
-                <button
-                  type="button"
-                  class="${pollState.resultsView === "list" ? "active" : ""}"
-                  data-poll-action="results-list"
-                  aria-pressed="${pollState.resultsView === "list"}"
-                >${iconList} List</button>
+            ? `<div
+                class="results-view-toggle"
+                role="group"
+                aria-label="Results view"
+                data-results-view="${pollState.resultsView}"
+              >
                 <button
                   type="button"
                   class="${pollState.resultsView === "grid" ? "active" : ""}"
                   data-poll-action="results-grid"
                   aria-pressed="${pollState.resultsView === "grid"}"
                 >${iconGrid} Grid</button>
+                <button
+                  type="button"
+                  class="${pollState.resultsView === "list" ? "active" : ""}"
+                  data-poll-action="results-list"
+                  aria-pressed="${pollState.resultsView === "list"}"
+                >${iconList} List</button>
               </div>`
             : ""
         }
@@ -1269,6 +1274,7 @@ async function saveResponse(event) {
       name: pollState.response.name.trim(),
       submitted: true,
     };
+    pollState.resultsView = "grid";
     persistResponse();
     if (pollState.pollId !== "sample") await syncPoll();
     pollState.editing = false;
@@ -1302,6 +1308,32 @@ async function copyPollLink() {
     input.remove();
   }
   showNotice("Copied to clipboard");
+}
+
+function switchResultsView(view, toggle) {
+  if (pollState.resultsView === view) return;
+  pollState.resultsView = view;
+  window.clearTimeout(pollState.resultsViewTimer);
+
+  if (!toggle) {
+    renderPoll();
+    return;
+  }
+
+  toggle.dataset.resultsView = view;
+  toggle.querySelectorAll("[data-poll-action]").forEach((button) => {
+    const active = button.dataset.pollAction === `results-${view}`;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  const reduceMotion = window.matchMedia?.(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  pollState.resultsViewTimer = window.setTimeout(
+    renderPoll,
+    reduceMotion ? 0 : 180,
+  );
 }
 
 function bindPollEvents() {
@@ -1338,11 +1370,9 @@ function bindPollEvents() {
         persistResponse();
         renderPoll();
       } else if (action === "results-list") {
-        pollState.resultsView = "list";
-        renderPoll();
+        switchResultsView("list", button.closest(".results-view-toggle"));
       } else if (action === "results-grid") {
-        pollState.resultsView = "grid";
-        renderPoll();
+        switchResultsView("grid", button.closest(".results-view-toggle"));
       } else if (action === "edit-response") {
         pollState.editing = true;
         renderPoll();
@@ -1376,7 +1406,8 @@ function initPoll(pollId, initialPoll, missing) {
     notice: "",
     noneChosen:
       response.submitted && Object.keys(response.availability).length === 0,
-    resultsView: "list",
+    resultsView: "grid",
+    resultsViewTimer: null,
   };
   persistResponse();
   renderPoll();
