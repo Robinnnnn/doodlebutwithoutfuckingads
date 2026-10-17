@@ -47,3 +47,23 @@ database.
 
 The production Worker deploys automatically from `main`. The deployment applies
 any pending D1 migrations before publishing the new Worker version.
+
+## Self-hosting
+
+The checked-in `wrangler.jsonc` targets the hosted app. Its Cloudflare account
+and D1 database IDs identify deployment resources; they are not credentials.
+Use your own account and database when deploying a copy:
+
+1. Copy `wrangler.example.jsonc` over `wrangler.jsonc` in your checkout.
+2. Choose a unique Worker name and D1 database name in that file.
+3. Run `npx wrangler d1 create <your-database-name>` and replace the example
+   `database_id` with the returned ID. If you use multiple Cloudflare accounts,
+   select yours with `CLOUDFLARE_ACCOUNT_ID`.
+4. Run `npm run db:migrate:local` and `npm run dev` to try your copy locally.
+5. Run `npm run deploy` when ready to apply the remote migrations and publish
+   to your own account. The example uses a `workers.dev` address; add your own
+   custom domain in Cloudflare if desired.
+
+Cloudflare credentials stay in Wrangler's local authentication or your CI
+environment. Never commit API tokens, local D1 state, or real poll exports.
+The built-in sample poll uses fictional names and does not access the database.

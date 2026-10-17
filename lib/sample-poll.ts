@@ -25,7 +25,7 @@ export function samplePollDefaults() {
 
   return {
     title: `${month} craft night`,
-    organizer: "Gemma",
+    organizer: "Avery",
     location: "Narnia",
     note: "Bring wine",
     timezone: "America/Los_Angeles",
@@ -37,8 +37,8 @@ export function samplePollDefaults() {
 export function samplePollParticipants() {
   return [
     {
-      id: "sample-gemma",
-      name: "Gemma",
+      id: "sample-avery",
+      name: "Avery",
       availabilities: [
         { optionId: "sample-1", status: "yes" as const },
         { optionId: "sample-2", status: "yes" as const },

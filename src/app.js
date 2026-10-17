@@ -238,7 +238,7 @@ let noticeTimer = null;
 function loadCreateDraft() {
   const fallback = {
     title: "",
-    organizer: "Gemma",
+    organizer: "",
     location: "",
     note: "",
     durationMinutes: 120,
@@ -255,7 +255,7 @@ function loadCreateDraft() {
     return {
       title: typeof saved.title === "string" ? saved.title : "",
       organizer:
-        typeof saved.organizer === "string" ? saved.organizer : "Gemma",
+        typeof saved.organizer === "string" ? saved.organizer : "",
       location: typeof saved.location === "string" ? saved.location : "",
       note: typeof saved.note === "string" ? saved.note : "",
       durationMinutes: knownDuration ? saved.durationMinutes : 120,
@@ -480,7 +480,7 @@ function renderCreate() {
               <input
                 data-draft-field="organizer"
                 value="${escapeHtml(draft.organizer)}"
-                placeholder="Gemma"
+                placeholder="Your name"
                 autocomplete="name"
                 required
               />
